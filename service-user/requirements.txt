@@ -1,0 +1,6 @@
+flask
+pyjwt
+python-dotenv
+flask-sqlalchemy
+flask-migrate
+werkzeug

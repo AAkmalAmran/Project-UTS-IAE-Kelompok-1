@@ -1,113 +1,126 @@
-from auth.routes import auth_bp
-from profile.routes import profile_bp
 import os
-import jwt
-from functools import wraps
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from datetime import datetime, timedelta
+from flask import Flask, jsonify, request
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from dotenv import load_dotenv
+from werkzeug.security import generate_password_hash, check_password_hash
+import jwt
 
+# Muat variabel lingkungan dari file .env
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # enable CORS untuk semua endpoint
-app.config['JWT_SECRET'] = os.getenv('JWT_SECRET')
 
-# NOTE: Untuk menambah role baru, tambahkan di sini
-# Contoh role yang bisa ditambahkan:
-# - SUPER_ADMIN: Akses penuh ke semua fitur
-# - OPERATOR: Bisa mengakses dashboard dan mengelola data
-# - USER: Hanya bisa mengakses fitur dasar
-# Implementasi: Tambahkan decorator baru seperti operator_required()
+# === Konfigurasi Aplikasi ===
+# Memuat konfigurasi dari variabel lingkungan (.env)
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///./instance/user.db")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+JWT_SECRET = os.environ.get("JWT_SECRET", "default-secret-key") # Default value untuk keamanan
+JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM", "HS256")
+TOKEN_TTL_MINUTES = int(os.environ.get("TOKEN_TTL_MINUTES", 30))
 
+# Memastikan folder 'instance' ada
+try:
+    os.makedirs(app.instance_path)
+except OSError:
+    pass
 
-def jwt_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = None
-        auth_header = request.headers.get('Authorization', '')
-
-        if auth_header:
-            # Handle both "Bearer token" and just "token"
-            parts = auth_header.split()
-            if len(parts) == 2 and parts[0].lower() == 'bearer':
-                token = parts[1]
-            elif len(parts) == 1:
-                token = parts[0]
-
-        if not token:
-            return jsonify({'error': 'token tidak ditemukan'}), 401
-
-        try:
-            # verif token
-            data = jwt.decode(
-                token, app.config['JWT_SECRET'], algorithms=['HS256'])
-            # simpen data user dari token ke req, biar bisa diakses di endpoint
-            request.user = data
-        except jwt.ExpiredSignatureError:
-            return jsonify({'error': 'token sudah kadaluarsa'}), 401
-        except jwt.InvalidTokenError:
-            return jsonify({'error': 'token tidak valid'}), 401
-
-        return f(*args, **kwargs)
-    return decorated
+# === Inisialisasi Database ===
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 
-def admin_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        # cek dulu apakah ada token (pakai jwt_required logic)
-        token = None
-        auth_header = request.headers.get('Authorization', '')
+# === Model Database ===
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False) # Menyimpan hash, bukan password asli
+    role = db.Column(db.String(80), nullable=False, default='user')
 
-        if auth_header:
-            # Handle both "Bearer token" and just "token"
-            parts = auth_header.split()
-            if len(parts) == 2 and parts[0].lower() == 'bearer':
-                token = parts[1]
-            elif len(parts) == 1:
-                token = parts[0]
-
-        if not token:
-            return jsonify({'error': 'token tidak ditemukan'}), 401
-
-        try:
-            data = jwt.decode(
-                token, app.config['JWT_SECRET'], algorithms=['HS256'])
-            request.user = data
-
-            # cek apakah role admin
-            if data.get('role') != 'admin':
-                return jsonify({'error': 'akses ditolak, butuh role admin'}), 403
-
-        except jwt.ExpiredSignatureError:
-            return jsonify({'error': 'token sudah kadaluarsa'}), 401
-        except jwt.InvalidTokenError:
-            return jsonify({'error': 'token tidak valid'}), 401
-
-        return f(*args, **kwargs)
-    return decorated
+    def __repr__(self):
+        return f'<User {self.username}>'
 
 
-app.register_blueprint(auth_bp)
-app.register_blueprint(profile_bp)
-
-# protect update_profile endpoint dengan jwt
-app.view_functions['profile_bp.update_profile'] = jwt_required(
-    app.view_functions['profile_bp.update_profile'])
-
-# protect admin endpoints - hanya admin yang bisa akses
-app.view_functions['auth_bp.get_all_users'] = admin_required(
-    app.view_functions['auth_bp.get_all_users'])
-app.view_functions['auth_bp.delete_user'] = admin_required(
-    app.view_functions['auth_bp.delete_user'])
+# === Fungsi Helper ===
+def generate_token(username: str, role: str) -> str:
+    """Membuat JWT token baru."""
+    payload = {
+        "sub": username,
+        "role": role,
+        "exp": datetime.utcnow() + timedelta(minutes=TOKEN_TTL_MINUTES),
+        "iat": datetime.utcnow(),
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
-@app.route("/")
-def index():
-    return "<h1>User Service API</h1>"
+# === Routes ===
+@app.post("/login")
+def login():
+    """Autentikasi pengguna dan mengembalikan token."""
+    credentials = request.get_json() or {}
+    username = credentials.get("username")
+    password = credentials.get("password")
+
+    if not username or not password:
+        return jsonify({"message": "Username dan password wajib diisi"}), 400
+
+    # Mengambil user dari database
+    user = User.query.filter_by(username=username).first()
+
+    # Memvalidasi user dan mengecek hash password
+    if not user or not check_password_hash(user.password_hash, password):
+        return jsonify({"message": "Kredensial tidak valid"}), 401
+
+    # Jika valid, buat token
+    token = generate_token(user.username, user.role)
+    return jsonify({"access_token": token})
+
+@app.post("/register")
+def register():
+    """Mendaftarkan pengguna baru."""
+    data = request.get_json() or {}
+    username = data.get("username")
+    password = data.get("password")
+    role = data.get("role", "user")
+
+    if not username or not password:
+        return jsonify({"message": "Username dan password wajib diisi"}), 400
+
+    # Cek apakah username sudah ada
+    if User.query.filter_by(username=username).first():
+        return jsonify({"message": "Username sudah terdaftar"}), 409
+
+    # Hash password sebelum disimpan
+    password_hash = generate_password_hash(password, method='pbkdf2:sha256')
+    new_user = User(username=username, password_hash=password_hash, role=role)
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({"message": f"User {username} berhasil didaftarkan."}), 201
 
 
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+@app.get("/health")
+def health():
+    """Endpoint untuk mengecek kesehatan layanan."""
+    return {"status": "auth service healthy"}
+
+
+# === Perintah CLI untuk Database ===
+@app.cli.command("init-db")
+def init_db_command():
+    """Membuat tabel database."""
+    db.create_all()
+
+    db.session.commit()
+    print("Database diinisialisasi.")
+
+
+# === Main execution ===
+if __name__ == "__main__":
+    # Mengambil host, port, dan debug dari .env
+    host = os.environ.get("FLASK_RUN_HOST", "0.0.0.0")
+    port = int(os.environ.get("FLASK_RUN_PORT", 5001))
+    debug = os.environ.get("FLASK_DEBUG", "True").lower() in ['true', '1']
+    
+    app.run(host=host, port=port, debug=debug)

@@ -1,0 +1,19 @@
+# .dockerignore
+
+# Abaikan semua environment .venv
+**/.venv
+.venv
+
+# Abaikan file .env (ini SANGAT PENTING untuk keamanan)
+**/.env
+
+# Abaikan cache Python
+**/__pycache__
+**/*.pyc
+
+# Abaikan file database lokal (kita akan pakai Volume)
+**/instance/
+
+# Git
+.git
+.gitignore

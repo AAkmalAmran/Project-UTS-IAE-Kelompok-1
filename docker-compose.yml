@@ -17,8 +17,7 @@ services:
       # ke folder instance di dalam container.
       # Jadi, file users.db Anda AKAN TETAP ADA (persisten)
       # walaupun container-nya dimatikan/dihapus.
-      # - ./service-user/instance:/app/instance
-      - user-db-data:/app/instance      
+      - ./service-user/instance:/app/instance 
     networks:
       - my_app_network
 

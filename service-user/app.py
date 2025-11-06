@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 # === Konfigurasi Aplikasi ===
 # Memuat konfigurasi dari variabel lingkungan (.env)
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///./instance/user.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:////./instance/user.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 JWT_SECRET = os.environ.get("JWT_SECRET", "default-secret-key") # Default value untuk keamanan
 JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM", "HS256")

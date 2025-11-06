@@ -1,0 +1,89 @@
+# docker-compose.yml
+
+
+services:
+  # --------------------------------
+  # Service User (Port 5001)
+  # --------------------------------
+  service-user:
+    build: 
+      context: ./service-user  # Path ke folder yang ada Dockerfile-nya
+    ports:
+      - "5001:5001"            # Map port [Host]:[Container]
+    env_file:
+      - ./service-user/.env    # Inject file .env ke dalam container
+    volumes:
+      # Penting: Ini 'menghubungkan' folder instance di host Anda
+      # ke folder instance di dalam container.
+      # Jadi, file users.db Anda AKAN TETAP ADA (persisten)
+      # walaupun container-nya dimatikan/dihapus.
+      - ./service-user/instance:/app/instance 
+    networks:
+      - my_app_network
+
+  # --------------------------------
+  # Service 1: Route
+  # --------------------------------
+  service-1-route:
+    build:
+      context: ./service-1-route
+    ports:
+      - "5002:5002" # Ganti dengan port service-1
+    env_file:
+      - ./service-1-route/.env # Tiap service punya .env sendiri
+    networks:
+      - my_app_network
+    # (Tambahkan 'volumes' jika service-1 juga butuh menyimpan file)
+
+  # --------------------------------
+  # Service 2: Stop
+  # --------------------------------
+  service-2-stop:
+    build:
+      context: ./service-2-stop
+    ports:
+      - "5003:5003" # Ganti dengan port service-2
+    env_file:
+      - ./service-2-stop/.env
+    networks:
+      - my_app_network
+
+  # --------------------------------
+  # Service 3: bus
+  # --------------------------------
+  service-3-bus:
+    build:
+      context: ./service-3-bus
+    ports:
+      - "5004:5004" # Ganti dengan port service-3
+    env_file:
+      - ./service-3-bus/.env
+    networks:
+      - my_app_network
+
+  # --------------------------------
+  # Service 4: schedule
+  # --------------------------------
+  service-4-schedule:
+    build:
+      context: ./service-4-schedule
+    ports:
+      - "5005:5005" # Ganti dengan port service-4
+    env_file:
+      - ./service-4-schedule/.env
+    networks:
+      - my_app_network
+
+# --------------------------------
+# Jaringan (Network)
+# --------------------------------
+# Ini membuat 'jaringan virtual' privat agar semua
+# container bisa saling memanggil menggunakan NAMA SERVICE-nya.
+# (Contoh: dari api-gateway, Anda bisa memanggil http://service-user:5001)
+networks:
+  my_app_network:
+    driver: bridge
+
+volumes:
+  user-db-data:
+    driver: local

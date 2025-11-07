@@ -13,10 +13,6 @@ services:
     env_file:
       - ./service-user/.env    # Inject file .env ke dalam container
     volumes:
-      # Penting: Ini 'menghubungkan' folder instance di host Anda
-      # ke folder instance di dalam container.
-      # Jadi, file users.db Anda AKAN TETAP ADA (persisten)
-      # walaupun container-nya dimatikan/dihapus.
       - ./service-user/instance:/app/instance 
     networks:
       - my_app_network
@@ -52,14 +48,16 @@ services:
   # Service 3: bus
   # --------------------------------
   service-3-bus:
-    build:
-      context: ./service-3-bus
-    ports:
-      - "5004:5004" # Ganti dengan port service-3
-    env_file:
-      - ./service-3-bus/.env
-    networks:
-      - my_app_network
+      build:
+        context: ./service-3-bus
+      ports:
+        - "5004:5004" # Port sudah benar
+      env_file:
+        - ./service-3-bus/.env
+      volumes:
+        - ./service-3-bus/instance:/app/instance 
+      networks:
+        - my_app_network
 
   # --------------------------------
   # Service 4: schedule

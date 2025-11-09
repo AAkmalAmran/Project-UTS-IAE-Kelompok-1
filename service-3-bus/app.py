@@ -87,11 +87,11 @@ def get_all_buses():
     }), 200
 
 
-@app.route('/buses', methods=['POST'])
+@app.route('/admin/buses/add', methods=['POST'])
 @admin_required
 def register_bus():
     """
-    POST /buses: Mendaftarkan bus baru ke dalam sistem.
+    POST /admin/buses/add: Mendaftarkan bus baru ke dalam sistem.
     """
     data = request.json
     
@@ -159,7 +159,7 @@ def update_bus_location(busId):
     return jsonify(bus.to_dict(include_route=True)), 200
 
 
-@app.route('/buses/<int:busId>/route', methods=['PUT'])
+@app.route('/admin/buses/<int:busId>/route/assign', methods=['PUT'])
 @admin_required
 def assign_bus_to_route(busId):
     """
@@ -209,7 +209,7 @@ def assign_bus_to_route(busId):
         }), 200
 
 
-@app.route('/buses/<int:busId>/route', methods=['DELETE'])
+@app.route('/admin/buses/<int:busId>/route/unassign', methods=['DELETE'])
 @admin_required
 def unassign_bus_from_route(busId):
     """
@@ -235,11 +235,11 @@ def unassign_bus_from_route(busId):
     }), 200
 
 
-@app.route('/buses/<int:busId>/speed', methods=['PUT'])
+@app.route('/admin/buses/<int:busId>/speed', methods=['PUT'])
 @admin_required
 def update_bus_speed(busId):
     """
-    PUT /buses/{busId}/speed: Update kecepatan rata-rata bus.
+    PUT /admin/buses/{busId}/speed: Update kecepatan rata-rata bus.
     Body: {"average_speed": 45.0}
     """
     bus = db.session.get(Bus, busId)
@@ -259,11 +259,11 @@ def update_bus_speed(busId):
     }), 200
 
 
-@app.route('/buses/<int:busId>/status', methods=['PUT'])
+@app.route('/admin/buses/<int:busId>/status', methods=['PUT'])
 @admin_required
 def update_bus_status(busId):
     """
-    PUT /buses/{busId}/status: Update status operasional bus.
+    PUT /admin/buses/{busId}/status: Update status operasional bus.
     Body: {"operational_status": "Maintenance"}
     Status: Available, In Service, Maintenance, Out of Service
     """

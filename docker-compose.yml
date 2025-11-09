@@ -27,9 +27,10 @@ services:
       - "5002:5002" # Ganti dengan port service-1
     env_file:
       - ./service-1-route/.env # Tiap service punya .env sendiri
+    volumes:
+      - ./service-1-route/instance:/app/instance # Simpan data DB
     networks:
       - my_app_network
-    # (Tambahkan 'volumes' jika service-1 juga butuh menyimpan file)
 
   # --------------------------------
   # Service 2: Stop
@@ -71,6 +72,8 @@ services:
       - "5005:5005" # Ganti dengan port service-4
     env_file:
       - ./service-4-schedule/.env
+    volumes:
+      - ./service-4-schedule/instance:/app/instance # Simpan data DB
     networks:
       - my_app_network
 

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Service - Jadwal & ETA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #43e97b;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #43e97b;
+        }
+
+        .eta-calculator {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .eta-calculator h2 {
+            color: white;
+            border-bottom-color: rgba(255,255,255,0.3);
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-field label {
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .input-field input,
+        .input-field select {
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .eta-result {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .eta-result.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .eta-time {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .eta-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .eta-detail-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .arrivals-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .arrival-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #43e97b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .arrival-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .arrival-info {
+            flex: 1;
+        }
+
+        .bus-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: #43e97b;
+            margin-bottom: 5px;
+        }
+
+        .route-name {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .eta-badge {
+            background: #43e97b;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .eta-minutes {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .eta-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .stop-selector {
+            margin-bottom: 20px;
+        }
+
+        .stop-selector select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #43e97b;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⏰ Schedule Service</h1>
+            <p>Jadwal Keberangkatan & ETA Real-time</p>
+        </div>
+
+        <!-- ETA Calculator -->
+        <div class="eta-calculator">
+            <h2>🎯 Hitung ETA Bus</h2>
+            <div class="input-group">
+                <div class="input-field">
+                    <label>Bus ID:</label>
+                    <input type="number" id="busId" placeholder="Masukkan Bus ID (1-6)" min="1">
+                </div>
+                <div class="input-field">
+                    <label>Stop ID:</label>
+                    <input type="number" id="stopId" placeholder="Masukkan Stop ID (1-20)" min="1">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="calculateETA()">
+                🚀 Hitung ETA
+            </button>
+            
+            <div id="etaResult" class="eta-result">
+                <div class="eta-time" id="etaTime">-</div>
+                <div class="eta-details">
+                    <div class="eta-detail-item">
+                        <strong>Bus:</strong> <span id="etaBusNumber">-</span>
+                    </div>
+                    <div class="eta-detail-item">
+                        <strong>Halte:</strong> <span id="etaStopName">-</span>
+                    </div>
+                    <div class="eta-detail-item">
+                        <strong>Jarak:</strong> <span id="etaDistance">-</span>
+                    </div>
+                    <div class="eta-detail-item">
+                        <strong>Kecepatan:</strong> <span id="etaSpeed">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stop Arrivals -->
+        <div class="card">
+            <h2>🚏 Bus yang Akan Tiba di Halte</h2>
+            <div class="stop-selector">
+                <select id="stopSelector" onchange="loadArrivals()">
+                    <option value="">Pilih Halte...</option>
+                    <option value="1">Halte 1 - Baleendah</option>
+                    <option value="5">Halte 5 - Museum Kota Bandung</option>
+                    <option value="7">Halte 7 - Alun-alun Bandung</option>
+                    <option value="9">Halte 9 - Stasiun Bandung</option>
+                    <option value="10">Halte 10 - BEC</option>
+                </select>
+            </div>
+            <div id="arrivalsList" class="arrivals-grid">
+                <p style="text-align: center; color: #666;">Pilih halte untuk melihat bus yang akan tiba</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function calculateETA() {
+            const busId = document.getElementById('busId').value;
+            const stopId = document.getElementById('stopId').value;
+            
+            if (!busId || !stopId) {
+                alert('Mohon isi Bus ID dan Stop ID');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('etaResult');
+            resultDiv.classList.remove('show');
+            
+            try {
+                const response = await fetch(`/eta?busId=${busId}&stopId=${stopId}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('etaTime').textContent = `${data.eta} menit`;
+                    document.getElementById('etaBusNumber').textContent = data.busNumber;
+                    document.getElementById('etaStopName').textContent = data.stopName;
+                    document.getElementById('etaDistance').textContent = `${data.distance} km`;
+                    document.getElementById('etaSpeed').textContent = `${data.averageSpeed} km/h`;
+                    
+                    resultDiv.classList.add('show');
+                } else {
+                    alert(data.error || 'Gagal menghitung ETA');
+                }
+            } catch (error) {
+                alert('Gagal terhubung ke server. Pastikan semua service berjalan.');
+                console.error('Error:', error);
+            }
+        }
+
+        async function loadArrivals() {
+            const stopId = document.getElementById('stopSelector').value;
+            const arrivalsList = document.getElementById('arrivalsList');
+            
+            if (!stopId) {
+                arrivalsList.innerHTML = '<p style="text-align: center; color: #666;">Pilih halte untuk melihat bus yang akan tiba</p>';
+                return;
+            }
+            
+            arrivalsList.innerHTML = '<div class="loading">Memuat data kedatangan bus...</div>';
+            
+            try {
+                const response = await fetch(`/stops/${stopId}/arrivals`);
+                const data = await response.json();
+                
+                if (response.ok && data.arrivals && data.arrivals.length > 0) {
+                    arrivalsList.innerHTML = '';
+                    
+                    data.arrivals.forEach(arrival => {
+                        const arrivalItem = document.createElement('div');
+                        arrivalItem.className = 'arrival-item';
+                        
+                        arrivalItem.innerHTML = `
+                            <div class="arrival-info">
+                                <div class="bus-number">${arrival.busNumber}</div>
+                                <div class="route-name">📍 ${arrival.routeName}</div>
+                                <div class="route-name">📏 ${arrival.distance} km</div>
+                            </div>
+                            <div class="eta-badge">
+                                <div class="eta-minutes">${arrival.eta}</div>
+                                <div class="eta-label">menit</div>
+                            </div>
+                        `;
+                        
+                        arrivalsList.appendChild(arrivalItem);
+                    });
+                } else {
+                    arrivalsList.innerHTML = '<p style="text-align: center; color: #666;">Tidak ada bus yang akan tiba dalam waktu dekat</p>';
+                }
+            } catch (error) {
+                arrivalsList.innerHTML = '<div class="error">Gagal memuat data. Pastikan semua service berjalan.</div>';
+                console.error('Error:', error);
+            }
+        }
+
+        // Auto refresh arrivals every 30 seconds
+        setInterval(() => {
+            const stopId = document.getElementById('stopSelector').value;
+            if (stopId) {
+                loadArrivals();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

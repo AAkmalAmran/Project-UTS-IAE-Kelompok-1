@@ -1,0 +1,29 @@
+# Gunakan base image Python 3.10 slim
+FROM python:3.10-slim
+
+# Set direktori kerja di dalam container
+WORKDIR /app
+
+# Copy file requirements dan install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy sisa kode aplikasi
+COPY . .
+
+# Buat folder 'instance' jika belum ada (untuk SQLite)
+RUN mkdir -p instance
+
+# Set environment variables untuk production
+ENV FLASK_APP=app.py
+ENV FLASK_DEBUG=False
+ENV DATABASE_URL=sqlite:///schedule.db
+ENV ROUTE_SERVICE_URL=http://service-route:5002
+ENV STOP_SERVICE_URL=http://service-stop:5003
+ENV BUS_SERVICE_URL=http://service-bus:5004
+
+# Expose port yang digunakan oleh Gunicorn
+EXPOSE 5005
+
+# Perintah untuk menjalankan aplikasi (production)
+CMD ["gunicorn", "--bind", "0.0.0.0:5005", "app:app"]

@@ -1,8 +1,10 @@
 import os
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from sqlalchemy import or_
+from functools import wraps
+import requests
 
 # Menggunakan relative import untuk models (memastikan models.py ada di folder yang sama)
 from models import db, Stop 
@@ -23,6 +25,33 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Inisialisasi Database
 db.init_app(app)
+
+# --- Middleware untuk Autentikasi Admin ---
+def admin_required(f):
+    """Decorator untuk memvalidasi admin credentials."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Dapatkan token dari header
+        token = request.headers.get('Authorization')
+        
+        if not token:
+            return jsonify({'error': 'Token tidak ditemukan'}), 401
+
+        try:
+            # Verifikasi token admin ke service-user
+            response = requests.get(
+                'http://service-user:5001/verify-admin',
+                headers={'Authorization': token}
+            )
+            
+            if response.status_code != 200:
+                return jsonify({'error': 'Unauthorized - Admin role required'}), 403
+                
+        except requests.exceptions.RequestException:
+            return jsonify({'error': 'Gagal terhubung ke service autentikasi'}), 500
+            
+        return f(*args, **kwargs)
+    return decorated_function
 
 # --- Definisi Data Seeding Dua Arah (Total 20 Halte) ---
 
@@ -78,7 +107,32 @@ RUTE_BEC_TO_BALEENDAH = [
 ALL_STOPS_DATA = RUTE_BALEENDAH_TO_BEC + RUTE_BEC_TO_BALEENDAH
 
 
-# --- Endpoint API ---
+# ========================================
+# WEB UI ENDPOINT
+# ========================================
+
+@app.route('/')
+def index():
+    """Serve the web UI"""
+    return render_template('index.html')
+
+
+# ========================================
+# ENDPOINTS UNTUK USER (PUBLIC - GET ONLY)
+# ========================================
+
+@app.route('/stops', methods=['GET'])
+def get_all_stops():
+    """
+    GET /stops: Mendapatkan daftar semua halte.
+    """
+    stops = Stop.query.all()
+    
+    return jsonify({
+        'total': len(stops),
+        'stops': [stop.to_dict() for stop in stops]
+    }), 200
+
 
 @app.route('/stops/<int:stopId>', methods=['GET'])
 def get_stop_detail(stopId):
@@ -126,6 +180,144 @@ def nearby_stops():
     # Catatan: Di sini, Anda akan melakukan filter dan sorting menggunakan rumus Haversine 
     # atau ekstensi database seperti PostGIS. Untuk saat ini, kita kembalikan semua data.
     return jsonify([stop.to_dict() for stop in all_stops]), 200
+
+# ========================================
+# ENDPOINTS UNTUK ADMIN (CRUD)
+# ========================================
+
+@app.route('/admin/stops', methods=['GET'])
+@admin_required
+def admin_get_all_stops():
+    """
+    GET /admin/stops: Admin dapat melihat semua halte.
+    """
+    stops = Stop.query.all()
+    
+    return jsonify({
+        'total': len(stops),
+        'stops': [stop.to_dict() for stop in stops]
+    }), 200
+
+
+@app.route('/admin/stops/add', methods=['POST'])
+@admin_required
+def admin_add_stop():
+    """
+    POST /admin/stops/add: Menambahkan halte baru.
+    Body JSON:
+    {
+        "name": "Halte Baru",
+        "latitude": -6.9195,
+        "longitude": 107.6105,
+        "address": "Jl. Contoh No. 123",
+        "shelter": true,
+        "seating": true,
+        "lighting": true,
+        "wheelchair_access": true,
+        "guiding_block": false,
+        "digital_eta_display": true,
+        "charging_port": false
+    }
+    """
+    data = request.get_json()
+    
+    if not data:
+        return jsonify({'error': 'Request body harus berupa JSON.'}), 400
+    
+    # Validasi field wajib
+    required_fields = ['name', 'latitude', 'longitude']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'error': f'Field {field} wajib diisi.'}), 400
+    
+    # Buat halte baru
+    new_stop = Stop(
+        name=data['name'],
+        latitude=data['latitude'],
+        longitude=data['longitude'],
+        address=data.get('address'),
+        shelter=data.get('shelter', False),
+        seating=data.get('seating', False),
+        lighting=data.get('lighting', False),
+        wheelchair_access=data.get('wheelchair_access', False),
+        guiding_block=data.get('guiding_block', False),
+        digital_eta_display=data.get('digital_eta_display', False),
+        charging_port=data.get('charging_port', False)
+    )
+    
+    db.session.add(new_stop)
+    db.session.commit()
+    
+    return jsonify({
+        'message': 'Halte berhasil ditambahkan.',
+        'stop': new_stop.to_dict()
+    }), 201
+
+
+@app.route('/admin/stops/<int:stopId>', methods=['PUT'])
+@admin_required
+def admin_update_stop(stopId):
+    """
+    PUT /admin/stops/{stopId}: Mengupdate informasi halte.
+    """
+    stop = db.session.get(Stop, stopId)
+    if not stop:
+        return jsonify({'error': 'Halte tidak ditemukan.'}), 404
+    
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Request body harus berupa JSON.'}), 400
+    
+    # Update field yang diberikan
+    if 'name' in data:
+        stop.name = data['name']
+    if 'latitude' in data:
+        stop.latitude = data['latitude']
+    if 'longitude' in data:
+        stop.longitude = data['longitude']
+    if 'address' in data:
+        stop.address = data['address']
+    if 'shelter' in data:
+        stop.shelter = data['shelter']
+    if 'seating' in data:
+        stop.seating = data['seating']
+    if 'lighting' in data:
+        stop.lighting = data['lighting']
+    if 'wheelchair_access' in data:
+        stop.wheelchair_access = data['wheelchair_access']
+    if 'guiding_block' in data:
+        stop.guiding_block = data['guiding_block']
+    if 'digital_eta_display' in data:
+        stop.digital_eta_display = data['digital_eta_display']
+    if 'charging_port' in data:
+        stop.charging_port = data['charging_port']
+    
+    db.session.commit()
+    
+    return jsonify({
+        'message': 'Halte berhasil diupdate.',
+        'stop': stop.to_dict()
+    }), 200
+
+
+@app.route('/admin/stops/<int:stopId>', methods=['DELETE'])
+@admin_required
+def admin_delete_stop(stopId):
+    """
+    DELETE /admin/stops/{stopId}: Menghapus halte.
+    """
+    stop = db.session.get(Stop, stopId)
+    if not stop:
+        return jsonify({'error': 'Halte tidak ditemukan.'}), 404
+    
+    stop_name = stop.name
+    db.session.delete(stop)
+    db.session.commit()
+    
+    return jsonify({
+        'message': f'Halte {stop_name} berhasil dihapus.'
+    }), 200
+
 
 # --- Perintah CLI untuk setup database & Seeding ---
 

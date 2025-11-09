@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from flask import Flask, jsonify, request, g # Tambahkan 'g'
+from flask import Flask, jsonify, request, g, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from dotenv import load_dotenv
@@ -128,6 +128,14 @@ def admin_required(f):
 
 
 # === Routes ===
+
+# WEB UI ENDPOINT
+@app.route('/')
+def index():
+    """Serve the web UI"""
+    return render_template('index.html')
+
+
 @app.post("/login")
 def login():
     """Autentikasi pengguna dan mengembalikan token."""
@@ -144,7 +152,15 @@ def login():
         return jsonify({"message": "Kredensial tidak valid"}), 401
 
     token = generate_token(user.username, user.role)
-    return jsonify({"access_token": token})
+    return jsonify({
+        "token": token,
+        "access_token": token,  # Keep for backward compatibility
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "role": user.role
+        }
+    })
 
 @app.post("/register")
 def register():
@@ -165,7 +181,39 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"message": f"User {username} berhasil didaftarkan."}), 201
+    return jsonify({
+        "message": f"User {username} berhasil didaftarkan.",
+        "user": {
+            "id": new_user.id,
+            "username": new_user.username,
+            "role": new_user.role
+        }
+    }), 201
+
+
+@app.get("/users")
+def get_users():
+    """Get all users"""
+    users = User.query.all()
+    return jsonify({
+        "users": [{
+            "id": user.id,
+            "username": user.username,
+            "role": user.role
+        } for user in users]
+    })
+
+
+@app.delete("/users/<int:user_id>")
+def delete_user(user_id):
+    """Delete a user"""
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({"message": f"User {user.username} deleted successfully"}), 200
 
 
 @app.get("/health")

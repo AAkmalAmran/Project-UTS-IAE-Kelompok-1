@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Service - Manajemen User</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #fa709a;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #fa709a;
+        }
+
+        .login-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .login-section h2 {
+            color: white;
+            border-bottom-color: rgba(255,255,255,0.3);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .user-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .user-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #fa709a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .username {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fa709a;
+            margin-bottom: 5px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .role-admin {
+            background: #dc3545;
+            color: white;
+        }
+
+        .role-user {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .token-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #fa709a;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👤 User Service</h1>
+            <p>Sistem Autentikasi & Manajemen User</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="adminCount">0</div>
+                <div class="stat-label">Admin</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="userCount">0</div>
+                <div class="stat-label">Regular Users</div>
+            </div>
+        </div>
+
+        <!-- Login Section -->
+        <div class="login-section">
+            <h2>🔐 Login</h2>
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" id="loginUsername" placeholder="Masukkan username">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="loginPassword" placeholder="Masukkan password">
+            </div>
+            <button class="btn btn-primary" onclick="login()">🚀 Login</button>
+            
+            <div id="loginResult"></div>
+        </div>
+
+        <!-- Register Section -->
+        <div class="card">
+            <h2>📝 Register User Baru</h2>
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" id="regUsername" placeholder="Masukkan username">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="regPassword" placeholder="Masukkan password">
+            </div>
+            <div class="form-group">
+                <label>Role:</label>
+                <select id="regRole" style="width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #ddd;">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <button class="btn btn-success" onclick="register()">✅ Register</button>
+            
+            <div id="registerResult"></div>
+        </div>
+
+        <!-- User List -->
+        <div class="card">
+            <h2>👥 Daftar User</h2>
+            <div id="userList" class="user-list">
+                <div class="loading">Memuat data user...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentToken = null;
+
+        // Load users on page load
+        async function loadUsers() {
+            try {
+                const response = await fetch('/users');
+                const data = await response.json();
+                
+                if (data.users && data.users.length > 0) {
+                    displayUsers(data.users);
+                    updateStats(data.users);
+                } else {
+                    document.getElementById('userList').innerHTML = 
+                        '<p style="text-align: center; color: #666;">Tidak ada user tersedia.</p>';
+                }
+            } catch (error) {
+                document.getElementById('userList').innerHTML = 
+                    '<div class="error">Gagal memuat data user. Pastikan server berjalan.</div>';
+                console.error('Error:', error);
+            }
+        }
+
+        function displayUsers(users) {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+
+            users.forEach(user => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                
+                const roleClass = user.role === 'admin' ? 'role-admin' : 'role-user';
+                
+                userItem.innerHTML = `
+                    <div class="user-info">
+                        <div class="username">${user.username}</div>
+                        <span class="role-badge ${roleClass}">${user.role.toUpperCase()}</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-danger" onclick="deleteUser(${user.id}, '${user.username}')">
+                            🗑️ Delete
+                        </button>
+                    </div>
+                `;
+                
+                userList.appendChild(userItem);
+            });
+        }
+
+        function updateStats(users) {
+            document.getElementById('totalUsers').textContent = users.length;
+            const adminCount = users.filter(u => u.role === 'admin').length;
+            document.getElementById('adminCount').textContent = adminCount;
+            document.getElementById('userCount').textContent = users.length - adminCount;
+        }
+
+        async function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                alert('Username dan password harus diisi!');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                const resultDiv = document.getElementById('loginResult');
+                
+                if (response.ok) {
+                    currentToken = data.token;
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <strong>✅ Login Berhasil!</strong><br>
+                            User: ${data.user.username}<br>
+                            Role: ${data.user.role}<br>
+                            <br>
+                            <strong>JWT Token:</strong>
+                            <div class="token-display">${data.token}</div>
+                        </div>
+                    `;
+                    
+                    // Clear form
+                    document.getElementById('loginUsername').value = '';
+                    document.getElementById('loginPassword').value = '';
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            ❌ ${data.error || 'Login gagal'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('loginResult').innerHTML = `
+                    <div class="error">❌ Gagal terhubung ke server</div>
+                `;
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            const role = document.getElementById('regRole').value;
+            
+            if (!username || !password) {
+                alert('Username dan password harus diisi!');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password, role })
+                });
+                
+                const data = await response.json();
+                const resultDiv = document.getElementById('registerResult');
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ User berhasil didaftarkan!<br>
+                            Username: ${data.user.username}<br>
+                            Role: ${data.user.role}
+                        </div>
+                    `;
+                    
+                    // Clear form
+                    document.getElementById('regUsername').value = '';
+                    document.getElementById('regPassword').value = '';
+                    
+                    // Reload user list
+                    setTimeout(loadUsers, 1000);
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            ❌ ${data.error || 'Registrasi gagal'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('registerResult').innerHTML = `
+                    <div class="error">❌ Gagal terhubung ke server</div>
+                `;
+            }
+        }
+
+        async function deleteUser(userId, username) {
+            if (!confirm(`Hapus user "${username}"?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/users/${userId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    alert('User berhasil dihapus!');
+                    loadUsers();
+                } else {
+                    const data = await response.json();
+                    alert(data.error || 'Gagal menghapus user');
+                }
+            } catch (error) {
+                alert('Gagal terhubung ke server');
+            }
+        }
+
+        window.onload = loadUsers;
+    </script>
+</body>
+</html>

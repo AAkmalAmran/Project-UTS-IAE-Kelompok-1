@@ -1,0 +1,658 @@
+{
+	"info": {
+		"_postman_id": "transport-system-api",
+		"name": "Transport System API - Complete",
+		"description": "Complete API collection for Transport System Microservices",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. User Service (5001)",
+			"item": [
+				{
+					"name": "Register Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\",\n  \"role\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5001/register",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5001",
+							"path": ["register"]
+						}
+					}
+				},
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"user1\",\n  \"password\": \"password123\",\n  \"role\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5001/register",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5001",
+							"path": ["register"]
+						}
+					}
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5001/login",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5001",
+							"path": ["login"]
+						}
+					}
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/users",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5001",
+							"path": ["users"]
+						}
+					}
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/users/2",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5001",
+							"path": ["users", "2"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Route Service (5002)",
+			"item": [
+				{
+					"name": "Public - Get All Routes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5002/routes",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5002",
+							"path": ["routes"]
+						}
+					}
+				},
+				{
+					"name": "Public - Get Route Detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5002/routes/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5002",
+							"path": ["routes", "1"]
+						}
+					}
+				},
+				{
+					"name": "Public - Get Route Stops",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5002/routes/1/stops",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5002",
+							"path": ["routes", "1", "stops"]
+						}
+					}
+				},
+				{
+					"name": "Public - Get Buses on Route",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5002/routes/1/buses",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5002",
+							"path": ["routes", "1", "buses"]
+						}
+					}
+				},
+				{
+					"name": "Admin - Create Route",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4xMjM="
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Rute D\",\n  \"description\": \"Rute baru dari Terminal ke Kampus\",\n  \"origin\": \"Terminal Leuwi Panjang\",\n  \"destination\": \"Universitas Padjadjaran\",\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5002/admin/routes",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5002",
+							"path": ["admin", "routes"]
+						}
+					}
+				},
+				{
+					"name": "Admin - Update Route",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4xMjM="
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Rute A Updated\",\n  \"description\": \"Deskripsi baru\",\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5002/admin/routes/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5002",
+							"path": ["admin", "routes", "1"]
+						}
+					}
+				},
+				{
+					"name": "Admin - Delete Route",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4xMjM="
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5002/admin/routes/3",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5002",
+							"path": ["admin", "routes", "3"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Stop Service (5003)",
+			"item": [
+				{
+					"name": "Public - Get All Stops",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5003/stops",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5003",
+							"path": ["stops"]
+						}
+					}
+				},
+				{
+					"name": "Public - Get Stop Detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5003/stops/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5003",
+							"path": ["stops", "1"]
+						}
+					}
+				},
+				{
+					"name": "Public - Search Stops",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5003/stops/search?query=Baleendah",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5003",
+							"path": ["stops", "search"],
+							"query": [
+								{
+									"key": "query",
+									"value": "Baleendah"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Admin - Create Stop",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4xMjM="
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Halte Baru ITB\",\n  \"address\": \"Jl. Ganesha No. 10, Bandung\",\n  \"latitude\": -6.8915,\n  \"longitude\": 107.6107,\n  \"shelter\": true,\n  \"seating\": true,\n  \"lighting\": true,\n  \"wheelchair_access\": true,\n  \"digital_eta_display\": true\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5003/admin/stops",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5003",
+							"path": ["admin", "stops"]
+						}
+					}
+				},
+				{
+					"name": "Admin - Update Stop",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4xMjM="
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Halte Updated\",\n  \"shelter\": true,\n  \"digital_eta_display\": true\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5003/admin/stops/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5003",
+							"path": ["admin", "stops", "1"]
+						}
+					}
+				},
+				{
+					"name": "Admin - Delete Stop",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4xMjM="
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5003/admin/stops/21",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5003",
+							"path": ["admin", "stops", "21"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Bus Service (5004)",
+			"item": [
+				{
+					"name": "Public - Get All Buses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5004/buses",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5004",
+							"path": ["buses"]
+						}
+					}
+				},
+				{
+					"name": "Public - Get Bus Detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5004/buses/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5004",
+							"path": ["buses", "1"]
+						}
+					}
+				},
+				{
+					"name": "Public - Update Bus Location",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"latitude\": -6.9175,\n  \"longitude\": 107.6191,\n  \"current_speed\": 45,\n  \"status_gps\": \"Online\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5004/buses/1/location",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5004",
+							"path": ["buses", "1", "location"]
+						}
+					}
+				},
+				{
+					"name": "Admin - Register Bus",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4xMjM="
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nomor_polisi\": \"D 7777 XYZ\",\n  \"kapasitas_penumpang\": 50,\n  \"model_kendaraan\": \"Mercedes-Benz OH 1526\",\n  \"average_speed\": 40,\n  \"operational_status\": \"Available\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5004/admin/buses",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5004",
+							"path": ["admin", "buses"]
+						}
+					}
+				},
+				{
+					"name": "Admin - Assign Bus to Route",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4xMjM="
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"route_id\": 1\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5004/admin/buses/1/assign",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5004",
+							"path": ["admin", "buses", "1", "assign"]
+						}
+					}
+				},
+				{
+					"name": "Admin - Update Bus Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4xMjM="
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"operational_status\": \"In Service\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5004/admin/buses/1/status",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5004",
+							"path": ["admin", "buses", "1", "status"]
+						}
+					}
+				},
+				{
+					"name": "Admin - Delete Bus",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4xMjM="
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5004/admin/buses/7",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5004",
+							"path": ["admin", "buses", "7"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Schedule Service (5005)",
+			"item": [
+				{
+					"name": "Public - Get Schedules by Route",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5005/schedules/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5005",
+							"path": ["schedules", "1"]
+						}
+					}
+				},
+				{
+					"name": "Public - Calculate ETA",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5005/eta?busId=1&stopId=5",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5005",
+							"path": ["eta"],
+							"query": [
+								{
+									"key": "busId",
+									"value": "1"
+								},
+								{
+									"key": "stopId",
+									"value": "5"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Public - Get Arrivals at Stop",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5005/stops/5/arrivals",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5005",
+							"path": ["stops", "5", "arrivals"]
+						}
+					}
+				},
+				{
+					"name": "Admin - Create Schedule",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4xMjM="
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"route_id\": 1,\n  \"bus_id\": 1,\n  \"departure_time\": \"08:00\",\n  \"frequency_minutes\": 15,\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5005/admin/schedules",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5005",
+							"path": ["admin", "schedules"]
+						}
+					}
+				},
+				{
+					"name": "Admin - Update Schedule",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4xMjM="
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"departure_time\": \"08:30\",\n  \"frequency_minutes\": 20,\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5005/admin/schedules/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5005",
+							"path": ["admin", "schedules", "1"]
+						}
+					}
+				},
+				{
+					"name": "Admin - Delete Schedule",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4xMjM="
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5005/admin/schedules/5",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5005",
+							"path": ["admin", "schedules", "5"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

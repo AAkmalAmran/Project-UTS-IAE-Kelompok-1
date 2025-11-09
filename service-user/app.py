@@ -191,7 +191,8 @@ def register():
     }), 201
 
 
-@app.get("/users")
+@app.get("/admin/users")
+@admin_required
 def get_users():
     """Get all users"""
     users = User.query.all()

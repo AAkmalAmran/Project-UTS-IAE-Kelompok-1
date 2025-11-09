@@ -9,18 +9,22 @@ services:
     build:
       context: ./api-gateway
     ports:
-      - "8080:8080"
-    env_file:
-      - ./api-gateway/.env
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - ROUTE_SERVICE_URL=http://service-1-route:5002
+      - STOP_SERVICE_URL=http://service-2-stop:5003
+      - BUS_SERVICE_URL=http://service-3-bus:5004
+      - SCHEDULE_SERVICE_URL=http://service-4-schedule:5005
+      - USER_SERVICE_URL=http://service-user:5001
     depends_on:
-      - service-user
       - service-1-route
       - service-2-stop
       - service-3-bus
       - service-4-schedule
+      - service-user
     networks:
       - my_app_network
-    restart: unless-stopped
   # --------------------------------
   # Service User (Port 5001)
   # --------------------------------

@@ -1,24 +1,18 @@
-# Use official Node.js LTS image
-FROM node:18-alpine
+FROM python:3.10-slim
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+ENV PYTHONUNBUFFERED=1
 
-# Install dependencies
-RUN npm install --production
+# copy requirements & install via python -m pip to avoid pip mismatch
+COPY requirements.txt /app/requirements.txt
+RUN python -m pip install --upgrade pip && \
+    python -m pip install --no-cache-dir -r /app/requirements.txt
 
-# Copy application code
-COPY . .
+# copy source
+COPY src/ /app/src/
 
-# Expose port
-EXPOSE 8080
+EXPOSE 5000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:8080/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
-
-# Start the application
-CMD ["node", "index.js"]
+# run the app as a module so `src` package imports resolve correctly
+CMD ["python", "-m", "src.app"]

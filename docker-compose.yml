@@ -3,6 +3,25 @@
 
 services:
   # --------------------------------
+  # API Gateway (Port 8080)
+  # --------------------------------
+  api-gateway:
+    build:
+      context: ./api-gateway
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./api-gateway/.env
+    depends_on:
+      - service-user
+      - service-1-route
+      - service-2-stop
+      - service-3-bus
+      - service-4-schedule
+    networks:
+      - my_app_network
+    restart: unless-stopped
+  # --------------------------------
   # Service User (Port 5001)
   # --------------------------------
   service-user:

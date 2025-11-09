@@ -38,9 +38,11 @@ services:
     build:
       context: ./service-2-stop
     ports:
-      - "5003:5003" # Ganti dengan port service-2
+      - "5003:5003" # Map port host:container
     env_file:
       - ./service-2-stop/.env
+    volumes:
+      - ./service-2-stop/instance:/app/instance # Simpan data DB
     networks:
       - my_app_network
 

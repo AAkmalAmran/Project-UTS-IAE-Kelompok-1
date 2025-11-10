@@ -1,18 +1,18 @@
+# Gunakan base image Python 3.10 slim
 FROM python:3.10-slim
 
+# Set direktori kerja di dalam container
 WORKDIR /app
 
-ENV PYTHONUNBUFFERED=1
+# Copy file requirements dan install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# copy requirements & install via python -m pip to avoid pip mismatch
-COPY requirements.txt /app/requirements.txt
-RUN python -m pip install --upgrade pip && \
-    python -m pip install --no-cache-dir -r /app/requirements.txt
+# Copy sisa kode aplikasi
+COPY . .
 
-# copy source
-COPY src/ /app/src/
-
+# Expose port yang digunakan oleh Gunicorn (port gateway)
 EXPOSE 5000
 
-# run the app as a module so `src` package imports resolve correctly
-CMD ["python", "-m", "src.app"]
+# Perintah untuk menjalankan aplikasi
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]

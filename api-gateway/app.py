@@ -1,13 +1,30 @@
 import os
 import requests
-from flask import Flask, request, jsonify, Response
+import jwt
+from flask import Flask, request, jsonify, Response, g
 from dotenv import load_dotenv
 
 load_dotenv()
 app = Flask(__name__)
 
-# 1. Ambil "peta" alamat service dari .env
-# Ini akan cocok dengan yang ada di docker-compose.yml Anda
+# --- 1. Konfigurasi JWT ---
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
+if not app.config["JWT_SECRET_KEY"]:
+    raise ValueError("JWT_SECRET_KEY tidak diatur di environment variables. Tambahkan ke file .env")
+
+# --- 2. Daftar Rute Publik ---
+PUBLIC_PATHS = [
+    '/',
+    '/api/user/<path:path>',
+    '/api/user/login',
+    '/api/user/register',
+    '/api/route/<path:path>',
+    '/api/stop/<path:path>',
+    '/api/bus/<path:path>',
+    '/api/schedule/<path:path>'
+
+]
+
 SERVICE_URLS = {
     "user": os.environ.get("USER_SERVICE_URL"),      # http://service-user:5001
     "route": os.environ.get("ROUTE_SERVICE_URL"),     # http://service-1-route:5002
@@ -16,56 +33,75 @@ SERVICE_URLS = {
     "schedule": os.environ.get("SCHEDULE_SERVICE_URL")# http://service-4-schedule:5005
 }
 
-# 2. Fungsi utama untuk meneruskan request
+# --- 3. Hook Validasi JWT ---
+@app.before_request
+def require_jwt_authentication():
+    # 1. Periksa apakah rute yang diminta ada di daftar publik
+    if request.path in PUBLIC_PATHS:
+        return
+
+    # 2. Dapatkan dan validasi token JWT
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({"error": "Authorization header is missing"}), 401
+
+    try:
+        parts = auth_header.split()
+        if parts[0].lower() != 'bearer' or len(parts) != 2:
+            raise ValueError("Format header Authorization tidak valid")
+        
+        token = parts[1]
+        payload = jwt.decode(
+            token,
+            app.config['JWT_SECRET_KEY'],
+            algorithms=['HS256']
+        )
+        g.user_payload = payload 
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token has expired"}), 401
+    except (jwt.InvalidTokenError, ValueError) as e:
+        return jsonify({"error": "Invalid token", "details": str(e)}), 401
+    
+    # --- 3. Validasi Role Admin (Otorisasi) ---
+    if '/admin' in request.path:
+        role = g.user_payload.get('role')
+        
+        if role != 'admin':
+            return jsonify({"error": "Admin access required for this resource"}), 403
+    return
+
+
+# --- 4. Fungsi Forwarder ---
 def forward_to_service(service_name, path):
     """
     Menerima request dari client dan meneruskannya (forward)
     ke service internal yang sesuai.
     """
-    
-    # Dapatkan URL service dari "peta"
     base_url = SERVICE_URLS.get(service_name)
     if not base_url:
         return jsonify({"error": f"Service '{service_name}' not configured"}), 500
 
-    # Gabungkan URL service dengan sisa path dari request
-    # Contoh: 'http://service-user:5001' + '/login'
-    # Contoh: 'http://service-user:5001' + '/admin/users'
     full_url = f"{base_url}/{path}"
-    
-    # ----------------------------------------------------
-    # INI BAGIAN PENTING UNTUK AUTENTIKASI ANDA:
-    # ----------------------------------------------------
-    # Salin semua header dari request asli dari client,
-    # termasuk 'Authorization', 'Content-Type', dll.
-    # Kecualikan header 'Host', karena host-nya sekarang adalah container gateway
     headers = {k: v for k, v in request.headers.items() if k.lower() != 'host'}
 
     try:
-        # Panggil service internal menggunakan library 'requests'
-        # 'requests' akan bertindak sebagai client di dalam gateway
         resp = requests.request(
-            method=request.method,       # Teruskan metode (GET, POST, dll)
-            url=full_url,                # URL service internal
-            headers=headers,             # Teruskan header (termasuk token)
-            data=request.get_data(),     # Teruskan body (JSON, form, dll)
-            params=request.args,       # Teruskan query params (misal: ?lat=123)
-            allow_redirects=False,     # Gateway tidak boleh auto-redirect
-            timeout=10.0               # Batas waktu 10 detik
+            method=request.method,
+            url=full_url,
+            headers=headers,
+            data=request.get_data(),
+            params=request.args,
+            allow_redirects=False,
+            timeout=10.0
         )
 
-        # 3. Buat respons baru untuk dikirim kembali ke client
-        
-        # Hapus header 'hop-by-hop' yang tidak boleh diteruskan
         excluded_headers = ['content-encoding', 'transfer-encoding', 'connection', 'content-length']
-        
-        # Salin header dari respons service internal
         response_headers = [
             (k, v) for k, v in resp.headers.items()
             if k.lower() not in excluded_headers
         ]
         
-        # Buat Flask Response dan kirim kembali ke client asli
         response = Response(resp.content, resp.status_code, response_headers)
         return response
 
@@ -74,15 +110,13 @@ def forward_to_service(service_name, path):
     except requests.exceptions.Timeout:
         return jsonify({"error": f"Service '{service_name}' timed out"}), 504
 
-# === Tentukan Rute Gateway ===
-# (Ini adalah "papan petunjuk" di lobi resepsionis)
-
+# === Rute Gateway ===
 @app.route('/', methods=['GET'])
 def gateway_index():
     """Halaman root dari gateway itu sendiri."""
     return jsonify({
         "message": "Welcome to the API Gateway",
-        "info": "Requests are routed based on URL prefix.",
+        "info": "Requests are routed based on URL prefix. Routes containing '/admin' are admin-protected.",
         "prefixes": [
             "/api/user/<path>",
             "/api/route/<path>",
@@ -92,41 +126,30 @@ def gateway_index():
         ]
     })
 
-# Semua request ke /api/user/* akan diteruskan ke SERVICE_USER_URL
-# Contoh:
-# GET /api/user/health -> service-user:5001/health
-# POST /api/user/login -> service-user:5001/login
-# GET /api/user/admin/users -> service-user:5001/admin/users
-@app.route('/api/user/', defaults={'path': ''}) # Menangani /api/user/
+@app.route('/api/user/', defaults={'path': ''})
 @app.route('/api/user/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def user_service(path):
     return forward_to_service("user", path)
 
-# Semua request ke /api/route/* akan diteruskan ke SERVICE_ROUTE_URL
 @app.route('/api/route/', defaults={'path': ''})
 @app.route('/api/route/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def route_service(path):
     return forward_to_service("route", path)
 
-# Semua request ke /api/stop/* akan diteruskan ke SERVICE_STOP_URL
 @app.route('/api/stop/', defaults={'path': ''})
 @app.route('/api/stop/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def stop_service(path):
     return forward_to_service("stop", path)
 
-# Semua request ke /api/bus/* akan diteruskan ke SERVICE_BUS_URL
 @app.route('/api/bus/', defaults={'path': ''})
 @app.route('/api/bus/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def bus_service(path):
     return forward_to_service("bus", path)
 
-# Semua request ke /api/schedule/* akan diteruskan ke SERVICE_SCHEDULE_URL
 @app.route('/api/schedule/', defaults={'path': ''})
 @app.route('/api/schedule/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def schedule_service(path):
     return forward_to_service("schedule", path)
 
-# Menjalankan server
 if __name__ == '__main__':
-    # Port 5000 adalah port untuk gateway
     app.run(debug=True, host='0.0.0.0', port=5000)

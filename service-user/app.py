@@ -27,11 +27,8 @@ JWT_SECRET = os.environ.get("JWT_SECRET", "default-secret-key")
 JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM", "HS256")
 TOKEN_TTL_MINUTES = int(os.environ.get("TOKEN_TTL_MINUTES", 30))
 
-# --- PERBAIKAN: Masukkan JWT_SECRET ke app.config ---
-# Agar bisa diakses secara konsisten di semua tempat
 app.config['JWT_SECRET'] = JWT_SECRET
 app.config['JWT_ALGORITHM'] = JWT_ALGORITHM
-# (SECRET_KEY Flask berbeda dari JWT_SECRET)
 app.config['SECRET_KEY'] = os.environ.get("FLASK_SECRET_KEY", "flask-fallback-key")
 
 
@@ -55,15 +52,13 @@ class User(db.Model):
 def generate_token(username: str, role: str) -> str:
     """Membuat JWT token baru."""
     payload = {
-        "sub": username, # 'sub' adalah username
+        "sub": username,
         "role": role,
         "exp": datetime.utcnow() + timedelta(minutes=TOKEN_TTL_MINUTES),
         "iat": datetime.utcnow(),
     }
-    # Gunakan JWT_SECRET dari app.config
     return jwt.encode(payload, app.config['JWT_SECRET'], algorithm=app.config['JWT_ALGORITHM'])
 
-# === PERBAIKAN DECORATOR ===
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -77,7 +72,6 @@ def token_required(f):
         if not token:
             return jsonify({'message': 'Token is missing!'}), 401
 
-        # (Kode normalisasi token Anda sudah bagus)
         if isinstance(token, bytes):
             token = token.decode('utf-8')
         token = token.strip().strip('"').strip("'")
@@ -85,24 +79,20 @@ def token_required(f):
             token = token[2:-1]
         
         try:
-            # --- PERBAIKAN 1: Gunakan app.config['JWT_SECRET'] ---
             data = jwt.decode(
                 token, 
                 app.config['JWT_SECRET'], 
                 algorithms=[app.config['JWT_ALGORITHM']]
             )
             
-            # --- PERBAIKAN 2: 'sub' adalah username, bukan id ---
             username = data.get('sub')
             if not username:
                 return jsonify({'message': 'Token is invalid!', 'reason': 'Missing subject (sub)'}), 401
                 
-            # Cari user berdasarkan username
             current_user = User.query.filter_by(username=username).first()
             if not current_user:
                 return jsonify({"error": "User not found"}), 404
             
-            # Simpan user di 'g' untuk request ini
             g.current_user = current_user
             
         except jwt.ExpiredSignatureError:
@@ -120,7 +110,6 @@ def admin_required(f):
     @wraps(f)
     @token_required
     def decorated_function(current_user, *args, **kwargs):
-        # 'current_user' didapat dari @token_required
         if current_user.role != 'admin':
             return jsonify({'message': 'Permission denied: Requires admin role.'}), 403
         return f(current_user, *args, **kwargs)
@@ -154,7 +143,7 @@ def login():
     token = generate_token(user.username, user.role)
     return jsonify({
         "token": token,
-        "access_token": token,  # Keep for backward compatibility
+        "access_token": token, 
         "user": {
             "id": user.id,
             "username": user.username,
@@ -222,11 +211,9 @@ def health():
     """Endpoint untuk mengecek kesehatan layanan."""
     return {"status": "auth service healthy"}
     
-# --- (Contoh penggunaan decorator admin_required di service-user) ---
 @app.get("/admin/test")
 @admin_required
 def admin_test(current_user):
-    # 'current_user' otomatis didapat dari decorator
     return jsonify(message=f"Halo admin {current_user.username}! Anda berhasil masuk.")
 
 @app.get("/verify-admin")

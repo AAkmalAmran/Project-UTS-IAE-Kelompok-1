@@ -103,9 +103,6 @@ services:
 # --------------------------------
 # Jaringan (Network)
 # --------------------------------
-# Ini membuat 'jaringan virtual' privat agar semua
-# container bisa saling memanggil menggunakan NAMA SERVICE-nya.
-# (Contoh: dari api-gateway, Anda bisa memanggil http://service-user:5001)
 networks:
   my_app_network:
     driver: bridge

@@ -54,20 +54,13 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# ========================================
 # WEB UI ENDPOINT
-# ========================================
-
 @app.route('/')
 def index():
     """Serve the web UI"""
     return render_template('index.html')
 
-
-# ========================================
-# ENDPOINTS UNTUK PUBLIC
-# ========================================
-
+# ENDPOINTS
 @app.route('/buses', methods=['GET'])
 def get_all_buses():
     """
@@ -406,5 +399,4 @@ def health_check():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    # Port 5004 agar sesuai dengan docker-compose
     app.run(debug=True, host='0.0.0.0', port=5004)

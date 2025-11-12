@@ -26,21 +26,20 @@ class Bus(db.Model):
     longitude = db.Column(db.Float, default=0.0)
     
     # === INTEGRASI DENGAN ROUTE SERVICE ===
-    # ID Rute yang sedang dilayani bus ini (Foreign Key ke Route Service)
-    route_id = db.Column(db.Integer, nullable=True)  # Null jika bus belum assigned
+    # ID Rute yang sedang dilayani bus ini
+    route_id = db.Column(db.Integer, nullable=True)
     
-    # Nama Rute (denormalisasi untuk performa)
+    # Nama Rute
     route_name = db.Column(db.String(100), nullable=True)
     
     # === KECEPATAN BUS ===
-    # Kecepatan rata-rata bus dalam km/jam
-    average_speed = db.Column(db.Float, default=40.0)  # Default 40 km/jam
+    average_speed = db.Column(db.Float, default=40.0)
     
-    # Kecepatan saat ini dalam km/jam (real-time dari GPS)
+    # Kecepatan saat ini dalam km/jam
     current_speed = db.Column(db.Float, default=0.0)
     
     # Status operasional bus
-    operational_status = db.Column(db.String(20), default='Available')  # Available, In Service, Maintenance, Out of Service
+    operational_status = db.Column(db.String(20), default='Available')
     
     def to_dict(self, include_route=False):
         """Helper function untuk konversi ke JSON response."""

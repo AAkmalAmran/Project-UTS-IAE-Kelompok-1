@@ -1,6 +1,3 @@
-# service-user/Dockerfile
-
-# 1. Mulai dari base image Python yang ringan
 FROM python:3.10-slim
 
 # 2. Set folder kerja di dalam container

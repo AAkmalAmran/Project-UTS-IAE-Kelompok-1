@@ -22,10 +22,9 @@ db_path = os.path.join(app.instance_path, 'bus.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', f'sqlite:///{db_path}')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# URL Route Service (untuk integrasi)
+# URL Route Service
 ROUTE_SERVICE_URL = os.environ.get('ROUTE_SERVICE_URL', 'http://localhost:5002')
 
-# Inisialisasi Database
 db.init_app(app)
 
 # --- Middleware untuk Verifikasi Token JWT ---
@@ -63,10 +62,6 @@ def index():
 # ENDPOINTS
 @app.route('/buses', methods=['GET'])
 def get_all_buses():
-    """
-    GET /buses: Mendapatkan daftar semua bus.
-    Query params: route_id (optional) untuk filter bus berdasarkan rute
-    """
     route_id = request.args.get('route_id', type=int)
     
     if route_id:
@@ -83,9 +78,6 @@ def get_all_buses():
 @app.route('/admin/buses/add', methods=['POST'])
 @admin_required
 def register_bus():
-    """
-    POST /admin/buses/add: Mendaftarkan bus baru ke dalam sistem.
-    """
     data = request.json
     
     # Validasi input
@@ -112,9 +104,6 @@ def register_bus():
 
 @app.route('/buses/<int:busId>', methods=['GET'])
 def get_bus_detail(busId):
-    """
-    GET /buses/{busId}: Mendapatkan detail dan lokasi bus tertentu.
-    """
     bus = db.session.get(Bus, busId)
     if not bus:
         return jsonify({'error': 'Bus tidak ditemukan.'}), 404
@@ -123,9 +112,6 @@ def get_bus_detail(busId):
 
 @app.route('/buses/<int:busId>/location', methods=['PUT'])
 def update_bus_location(busId):
-    """
-    PUT /buses/{busId}/location: Memperbarui posisi dan kecepatan bus secara real-time.
-    """
     bus = db.session.get(Bus, busId)
     if not bus:
         return jsonify({'error': 'Bus tidak ditemukan.'}), 404
@@ -155,10 +141,6 @@ def update_bus_location(busId):
 @app.route('/admin/buses/<int:busId>/route/assign', methods=['PUT'])
 @admin_required
 def assign_bus_to_route(busId):
-    """
-    PUT /buses/{busId}/route: Assign bus ke rute tertentu.
-    Body: {"route_id": 1, "route_name": "Rute A"}
-    """
     bus = db.session.get(Bus, busId)
     if not bus:
         return jsonify({'error': 'Bus tidak ditemukan.'}), 404
@@ -205,9 +187,6 @@ def assign_bus_to_route(busId):
 @app.route('/admin/buses/<int:busId>/route/unassign', methods=['DELETE'])
 @admin_required
 def unassign_bus_from_route(busId):
-    """
-    DELETE /buses/{busId}/route: Unassign bus dari rute.
-    """
     bus = db.session.get(Bus, busId)
     if not bus:
         return jsonify({'error': 'Bus tidak ditemukan.'}), 404
@@ -231,10 +210,6 @@ def unassign_bus_from_route(busId):
 @app.route('/admin/buses/<int:busId>/speed', methods=['PUT'])
 @admin_required
 def update_bus_speed(busId):
-    """
-    PUT /admin/buses/{busId}/speed: Update kecepatan rata-rata bus.
-    Body: {"average_speed": 45.0}
-    """
     bus = db.session.get(Bus, busId)
     if not bus:
         return jsonify({'error': 'Bus tidak ditemukan.'}), 404
@@ -255,11 +230,6 @@ def update_bus_speed(busId):
 @app.route('/admin/buses/<int:busId>/status', methods=['PUT'])
 @admin_required
 def update_bus_status(busId):
-    """
-    PUT /admin/buses/{busId}/status: Update status operasional bus.
-    Body: {"operational_status": "Maintenance"}
-    Status: Available, In Service, Maintenance, Out of Service
-    """
     bus = db.session.get(Bus, busId)
     if not bus:
         return jsonify({'error': 'Bus tidak ditemukan.'}), 404
@@ -283,9 +253,6 @@ def update_bus_status(busId):
 
 @app.route('/routes/<int:routeId>/buses', methods=['GET'])
 def get_buses_by_route(routeId):
-    """
-    GET /routes/{routeId}/buses: Mendapatkan semua bus yang melayani rute tertentu.
-    """
     buses = Bus.query.filter_by(route_id=routeId).all()
     
     return jsonify({
@@ -297,9 +264,6 @@ def get_buses_by_route(routeId):
 # --- Perintah CLI untuk setup database ---
 @app.cli.command('init-db')
 def init_db_command():
-    """
-    Perintah untuk menginisialisasi database.
-    """
     with app.app_context():
         db.create_all()
         print('Database Bus telah diinisialisasi.')
@@ -307,9 +271,6 @@ def init_db_command():
 
 @app.cli.command('seed-buses')
 def seed_buses_command():
-    """
-    Menambahkan data bus sample untuk testing.
-    """
     with app.app_context():
         # Hapus data lama
         Bus.query.delete()
@@ -395,7 +356,7 @@ def health_check():
         'database': 'connected'
     })
 
-# Menjalankan server (sesuai port di docker-compose)
+# Menjalankan server
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

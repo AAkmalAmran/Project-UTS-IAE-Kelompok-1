@@ -87,7 +87,7 @@ def token_required(f):
             
             username = data.get('sub')
             if not username:
-                return jsonify({'message': 'Token is invalid!', 'reason': 'Missing subject (sub)'}), 401
+                return jsonify({'message': 'Token invalid!', 'reason': 'Missing subject (sub)'}), 401
                 
             current_user = User.query.filter_by(username=username).first()
             if not current_user:
@@ -98,7 +98,7 @@ def token_required(f):
         except jwt.ExpiredSignatureError:
             return jsonify({"error": "Token expired"}), 401
         except jwt.InvalidTokenError as e:
-            return jsonify({'message': 'Token is invalid!', 'error': str(e)}), 401
+            return jsonify({'message': 'Token invalid!', 'error': str(e)}), 401
 
         # Kirim user yang sudah ditemukan ke fungsi aslinya
         return f(current_user, *args, **kwargs)
@@ -111,7 +111,7 @@ def admin_required(f):
     @token_required
     def decorated_function(current_user, *args, **kwargs):
         if current_user.role != 'admin':
-            return jsonify({'message': 'Permission denied: Requires admin role.'}), 403
+            return jsonify({'message': 'Permission denied: Anda bukan admin.'}), 403
         return f(current_user, *args, **kwargs)
     return decorated_function
 
@@ -121,7 +121,6 @@ def admin_required(f):
 # WEB UI ENDPOINT
 @app.route('/')
 def index():
-    """Serve the web UI"""
     return render_template('index.html')
 
 
@@ -183,7 +182,6 @@ def register():
 @app.get("/admin/users")
 @admin_required
 def get_users():
-    """Get all users"""
     users = User.query.all()
     return jsonify({
         "users": [{
@@ -196,19 +194,17 @@ def get_users():
 
 @app.delete("/users/<int:user_id>")
 def delete_user(user_id):
-    """Delete a user"""
     user = User.query.get(user_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
     
     db.session.delete(user)
     db.session.commit()
-    return jsonify({"message": f"User {user.username} deleted successfully"}), 200
+    return jsonify({"message": f"User {user.username} berhasil dihapus"}), 200
 
 
 @app.get("/health")
 def health():
-    """Endpoint untuk mengecek kesehatan layanan."""
     return {"status": "auth service healthy"}
     
 @app.get("/admin/test")
@@ -219,7 +215,6 @@ def admin_test(current_user):
 @app.get("/verify-admin")
 @token_required
 def verify_admin(current_user):
-    """Endpoint untuk memverifikasi apakah token adalah milik admin."""
     if current_user.role != 'admin':
         return jsonify({'message': 'Permission denied: Requires admin role.'}), 403
     return jsonify({'message': 'Valid admin token', 'username': current_user.username}), 200
@@ -235,7 +230,6 @@ def init_db_command():
     
 @app.cli.command("seed-admin")
 def seed_admin_command():
-    """Membuat user admin default untuk tes."""
     username = "admin"
     password = "admin123"
     

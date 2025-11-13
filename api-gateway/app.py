@@ -1,10 +1,15 @@
 import os
 import requests
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, send_from_directory
 from dotenv import load_dotenv
+from flask_cors import CORS
+
 
 load_dotenv()
-app = Flask(__name__)
+# app = Flask(__name__)
+
+app = Flask(__name__, static_folder='frontend')
+CORS(app)
 
 # 1. Ambil "peta" alamat service dari .env
 SERVICE_URLS = {
@@ -61,19 +66,25 @@ def forward_to_service(service_name, path):
 
 # === Tentukan Rute Gateway ===
 @app.route('/', methods=['GET'])
-def gateway_index():
-    """Halaman root dari gateway itu sendiri."""
-    return jsonify({
-        "message": "Welcome to the API Gateway",
-        "info": "Requests are routed based on URL prefix.",
-        "prefixes": [
-            "/api/user/<path>",
-            "/api/route/<path>",
-            "/api/stop/<path>",
-            "/api/bus/<path>",
-            "/api/schedule/<path>",
-        ]
-    })
+def serve_index():
+    return send_from_directory(app.static_folder, 'index.html')
+
+
+
+# @app.route('/', methods=['GET'])
+# def gateway_index():
+#     """Halaman root dari gateway itu sendiri."""
+#     return jsonify({
+#         "message": "Welcome to the API Gateway",
+#         "info": "Requests are routed based on URL prefix.",
+#         "prefixes": [
+#             "/api/user/<path>",
+#             "/api/route/<path>",
+#             "/api/stop/<path>",
+#             "/api/bus/<path>",
+#             "/api/schedule/<path>",
+#         ]
+#     })
 
 # Semua request ke /api/user/* akan diteruskan ke SERVICE_USER_URL
 @app.route('/api/user/', defaults={'path': ''})

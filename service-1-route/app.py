@@ -28,7 +28,7 @@ ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
 
 # URL Bus Service (untuk integrasi)
 BUS_SERVICE_URL = os.environ.get('BUS_SERVICE_URL', 'http://localhost:5004')
-
+STOP_SERVICE_URL = os.environ.get('STOP_SERVICE_URL', 'http://localhost:5003')
 # Inisialisasi Database
 db.init_app(app)
 
@@ -168,6 +168,155 @@ def search_routes():
         'routes': [route.to_dict() for route in routes]
     }), 200
 
+
+@app.route('/routes/nearby', methods=['GET'])
+def get_nearby_routes():
+    """
+    GET /routes/nearby?lat=<lat>&lon=<lon>&radius=<r>
+    Menampilkan rute yang berdekatan dengan lokasi pengguna (radius default 5 km).
+    """
+    try:
+        # Ambil parameter dari query string
+        lat = request.args.get('lat', type=float)
+        lon = request.args.get('lon', type=float)
+        radius = request.args.get('radius', default=5.0, type=float)
+        
+        if lat is None or lon is None:
+            return jsonify({'error': 'Parameter lat dan lon wajib diisi'}), 400
+        
+        if not (-90 <= lat <= 90) or not (-180 <= lon <= 180):
+            return jsonify({'error': 'Koordinat tidak valid'}), 400
+        
+        # Ambil semua rute aktif
+        routes = Route.query.filter_by(is_active=True).all()
+        nearby_routes = []
+        
+        for route in routes:
+            # Cek apakah ada stops dalam radius
+            route_stops = route.route_stops
+            stops_in_radius = []
+            
+            for stop in route_stops:
+                try:
+                    # Ambil koordinat stop dari Stop Service
+                    stop_response = requests.get(f'{STOP_SERVICE_URL}/stops/{stop.stop_id}', timeout=5)
+                    if stop_response.status_code == 200:
+                        stop_data = stop_response.json()
+                        coordinates = stop_data.get('coordinates', {})
+                        
+                        if coordinates and 'latitude' in coordinates and 'longitude' in coordinates:
+                            stop_lat = coordinates['latitude']
+                            stop_lon = coordinates['longitude']
+                            
+                            # Hitung jarak menggunakan haversine
+                            distance = haversine_distance(lat, lon, stop_lat, stop_lon)
+                            
+                            if distance <= radius:
+                                stops_in_radius.append({
+                                    'stopId': stop.stop_id,
+                                    'stopName': stop.stop_name,
+                                    'sequenceOrder': stop.sequence_order,
+                                    'distance': round(distance, 2),
+                                    'coordinates': coordinates
+                                })
+                except requests.exceptions.RequestException:
+                    continue
+            
+            # Jika ada stops dalam radius, tambahkan route
+            if stops_in_radius:
+                # Urutkan stops berdasarkan jarak terdekat
+                stops_in_radius.sort(key=lambda x: x['distance'])
+                
+                route_dict = route.to_dict(include_stops=False)
+                route_dict['nearbyStops'] = stops_in_radius
+                route_dict['closestStopDistance'] = stops_in_radius[0]['distance']
+                
+                nearby_routes.append(route_dict)
+        
+        # Urutkan routes berdasarkan jarak stop terdekat
+        nearby_routes.sort(key=lambda x: x['closestStopDistance'])
+        
+        return jsonify({
+            'userLocation': {'latitude': lat, 'longitude': lon},
+            'searchRadius': radius,
+            'totalRoutes': len(nearby_routes),
+            'routes': nearby_routes
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Gagal mencari rute terdekat: {str(e)}'}), 500
+
+
+@app.route('/routes/<int:routeId>/buses', methods=['GET'])
+def get_route_buses(routeId):
+    """
+    GET /routes/<int:routeId>/buses
+    Mengambil semua bus yang sedang beroperasi di rute tertentu (integrasi dengan Bus Service).
+    """
+    # Cek apakah route exists
+    route = Route.query.get(routeId)
+    if not route:
+        return jsonify({'error': 'Rute tidak ditemukan'}), 404
+    
+    try:
+        # Ambil data bus dari Bus Service
+        bus_response = requests.get(f'{BUS_SERVICE_URL}/routes/{routeId}/buses', timeout=10)
+        
+        if bus_response.status_code == 200:
+            bus_data = bus_response.json()
+            
+            # Enhance dengan informasi route
+            enhanced_data = {
+                'routeId': routeId,
+                'routeName': route.name,
+                'routeDescription': route.description,
+                'routeActive': route.is_active,
+                'totalBuses': bus_data.get('total', 0),
+                'buses': bus_data.get('buses', [])
+            }
+            
+            # Tambahkan informasi stops untuk setiap bus jika ada
+            for bus in enhanced_data['buses']:
+                if 'currentStopId' in bus:
+                    # Cari informasi stop dari route stops
+                    current_stop = RouteStop.query.filter_by(
+                        route_id=routeId, 
+                        stop_id=bus['currentStopId']
+                    ).first()
+                    
+                    if current_stop:
+                        bus['currentStopName'] = current_stop.stop_name
+                        bus['sequenceOrder'] = current_stop.sequence_order
+            
+            return jsonify(enhanced_data), 200
+            
+        elif bus_response.status_code == 404:
+            return jsonify({
+                'routeId': routeId,
+                'routeName': route.name,
+                'totalBuses': 0,
+                'buses': [],
+                'message': 'Tidak ada bus yang beroperasi di rute ini'
+            }), 200
+            
+        else:
+            return jsonify({
+                'routeId': routeId,
+                'routeName': route.name,
+                'totalBuses': 0,
+                'buses': [],
+                'error': f'Bus Service error: {bus_response.status_code}'
+            }), 200
+            
+    except requests.exceptions.RequestException as e:
+        return jsonify({
+            'routeId': routeId,
+            'routeName': route.name,
+            'totalBuses': 0,
+            'buses': [],
+            'error': 'Bus Service tidak tersedia'
+        }), 200
+
 # ========================================
 # ENDPOINTS UNTUK ADMIN (CRUD)
 # ========================================
@@ -270,7 +419,7 @@ def admin_update_route(routeId):
     if 'destination' in data:
         route.destination = data['destination']
     
-    if 'isActive' in data:
+    if 'isActive' in data:  
         route.is_active = data['isActive']
     
     db.session.commit()
@@ -353,6 +502,52 @@ def admin_add_stop_to_route(routeId):
         'message': 'Halte berhasil ditambahkan ke rute.',
         'routeStop': route_stop.to_dict()
     }), 201
+
+@app.route('/admin/routes/<int:routeId>/stops/<int:routeStopId>', methods=['PUT'])
+@admin_required
+def admin_update_route_stop(routeId, routeStopId):
+    """
+    PUT /admin/routes/{routeId}/stops/{routeStopId}: Mengupdate informasi halte dalam rute.
+    """
+    route_stop = RouteStop.query.filter_by(id=routeStopId, route_id=routeId).first()
+    if not route_stop:
+        return jsonify({'error': 'Route stop tidak ditemukan.'}), 404
+    
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Request body harus berupa JSON.'}), 400
+    
+    # Update field yang diberikan
+    if 'sequenceOrder' in data:
+        # Cek duplikasi sequence order
+        existing = RouteStop.query.filter(
+            RouteStop.route_id == routeId,
+            RouteStop.sequence_order == data['sequenceOrder'],
+            RouteStop.id != routeStopId
+        ).first()
+        if existing:
+            return jsonify({'error': f'Sequence order {data["sequenceOrder"]} sudah ada.'}), 400
+        route_stop.sequence_order = data['sequenceOrder']
+
+    if 'stopName' in data:
+        route_stop.stop_name = data['stopName']
+
+    if 'distanceToNext' in data:
+        route_stop.distance_to_next = data.get('distanceToNext')
+
+    if 'timeToNext' in data:
+        route_stop.time_to_next = data.get('timeToNext')
+    
+    try:
+        db.session.commit()
+        return jsonify({
+            'message': 'Route stop berhasil diupdate.',
+            'routeStop': route_stop.to_dict()
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Gagal mengupdate route stop: {str(e)}'}), 500
+
 
 @app.route('/admin/routes/<int:routeId>/stops/<int:routeStopId>', methods=['DELETE'])
 @admin_required

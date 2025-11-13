@@ -55,7 +55,7 @@ docker-compose run --rm service-4-schedule flask seed-schedules
 
 ### **5. Cek Apakah Proyek Sudah Berjalan di Docker Desktop**
 
-### **6. Buka Browser dan Paste localhost:5000**
+### **6. Buka Browser dan Buka http://localhost:5000**
 
 ---
 

@@ -63,10 +63,10 @@ docker-compose run --rm service-4-schedule flask seed-schedules
 
 | Nama             | NIM   | Peran                                    |
 | ---------------- | ----- | ---------------------------------------- |
-| **AHMAD AKMAL AMRAN** | 102022300010 | Implementasi User Service, Bus Service, dan API Gateway |
-| **FIRDAUS AL HAMID** | 102022300403 | Implementasi Route Service dan Schedule Service |
-| **ILHAM FAHMI** | 102022300223 | Implementasi Stop Service dan Frontend             |
-| **JOSUA IMMANUEL NATANAEL PASARIBU** | 102022300271 | Bertanggung jawab terhadap Schedule Service    |
+| **AHMAD AKMAL AMRAN** | 102022300010 | Membuat User Service, Bus Service, dan API Gateway |
+| **FIRDAUS AL HAMID** | 102022300403 | Membuat Route Service dan Schedule Service |
+| **ILHAM FAHMI** | 102022300223 | Membuat Stop Service dan Frontend |
+| **JOSUA IMMANUEL NATANAEL PASARIBU** | 102022300271 | Bertanggung jawab terhadap Schedule Service (mana ruwasqachu ni imapipas) |
 
 ---
 
@@ -105,15 +105,12 @@ docker-compose run --rm service-4-schedule flask seed-schedules
 | GET | `/routes` | Mengambil semua rute **aktif**. |
 | GET | `/routes/<int:routeId>` | Mengambil detail satu rute berdasarkan ID (termasuk daftar halte di dalamnya). |
 | GET | `/routes/<int:routeId>/stops` | Mengambil daftar halte dalam rute tertentu, sesuai urutan. |
-| GET | `/routes/nearby?lat=<lat>&lon=<lon>&radius=<r>` | Menampilkan rute yang berdekatan dengan lokasi pengguna (radius default 5 km). |
 | GET | `/routes/search?query=<nama>` | Mencari rute berdasarkan nama atau deskripsi. |
-| GET | `/routes/<int:routeId>/buses` | Mengambil semua bus yang sedang beroperasi di rute tertentu (integrasi dengan Bus Service). |
 | GET | `/admin/routes` | Menampilkan semua rute (termasuk non-aktif) — **khusus Admin**. |
 | POST | `/admin/routes/add` | Menambahkan rute baru ke database (beserta daftar halte opsional) — **khusus Admin**. |
 | PUT | `/admin/routes/<int:routeId>` | Memperbarui detail rute (nama, asal, tujuan, status aktif) — **khusus Admin**. |
 | DELETE | `/admin/routes/<int:routeId>` | Menghapus rute dari database — **khusus Admin**. |
 | POST | `/admin/routes/<int:routeId>/stops/add` | Menambahkan halte ke dalam rute tertentu — **khusus Admin**. |
-| PUT | `/admin/routes/<int:routeId>/stops/<int:routeStopId>` | Memperbarui informasi halte di dalam rute — **khusus Admin**. |
 | DELETE | `/admin/routes/<int:routeId>/stops/<int:routeStopId>` | Menghapus halte dari rute — **khusus Admin**. |
 | GET | `/health` | Mengecek status service dan koneksi database. |
 

@@ -4,17 +4,13 @@ from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import requests
 from functools import wraps
-
-# Import models
 from models import db, Bus
 
-# Muat variabel lingkungan dari file .env
 load_dotenv()
 
-# Inisialisasi Aplikasi Flask
 app = Flask(__name__, instance_relative_config=True)
 
-# Memastikan folder instance ada (untuk SQLite)
+# Memastikan folder instance ada
 os.makedirs(app.instance_path, exist_ok=True)
 
 # Konfigurasi Database
@@ -41,7 +37,7 @@ def admin_required(f):
             # Verifikasi token admin ke service-user
             response = requests.get(
                 'http://service-user:5001/verify-admin',
-                headers={'Authorization': token}  # Kirim token yang sama
+                headers={'Authorization': token}
             )
             
             if response.status_code != 200:
@@ -126,11 +122,9 @@ def update_bus_location(busId):
     bus.latitude = data['latitude']
     bus.longitude = data['longitude']
     
-    # Update kecepatan saat ini (dari GPS)
     if 'current_speed' in data:
         bus.current_speed = data['current_speed']
     
-    # Update status GPS jika ada di data, jika tidak, set ke 'Online'
     bus.status_gps = data.get('status_gps', 'Online') 
     
     db.session.commit()
@@ -170,7 +164,6 @@ def assign_bus_to_route(busId):
         }), 200
         
     except requests.exceptions.RequestException:
-        # Jika Route Service tidak tersedia, tetap assign tapi dengan warning
         bus.route_id = data['route_id']
         bus.route_name = data.get('route_name', f'Route {data["route_id"]}')
         bus.operational_status = 'In Service'

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin Bus</title>
+    <!-- Muat Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Menggunakan font Inter yang modern */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Header (Navbar) -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            
+            <!-- Navigasi Utama -->
+            <div class="flex items-center space-x-8">
+                <h1 class="text-2xl font-bold text-gray-800">Sistem Rute Bus</h1>
+                <div class="flex space-x-4">
+                    <button id="nav-routes" class="py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600">
+                        Rute
+                    </button>
+                    <button id="nav-stops" class="py-2 text-sm font-medium text-gray-500 hover:text-gray-800 border-b-2 border-transparent hover:border-gray-300">
+                        Halte
+                    </button>
+                    <button id="nav-buses" class="py-2 text-sm font-medium text-gray-500 hover:text-gray-800 border-b-2 border-transparent hover:border-gray-300">
+                        Bus
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Kontainer Otentikasi (Pojok Kanan Atas) -->
+            <div id="auth-container" class="space-x-4 flex items-center">
+                <!-- Konten ini akan diisi oleh JavaScript -->
+            </div>
+        </nav>
+    </header>
+
+    <!-- Konten Utama -->
+    <main class="container mx-auto px-6 py-8">
+
+        <!-- Bagian Form Login/Register (Tersembunyi secara default) -->
+        <div id="forms-section" class="hidden bg-white p-8 rounded-lg shadow-md mb-8 max-w-4xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Form Register -->
+                <div>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Register</h2>
+                    <form id="register-form">
+                        <div class="mb-4">
+                            <label for="reg-username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                            <input type="text" id="reg-username" name="username" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="reg-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                            <input type="password" id="reg-password" name="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">Register</button>
+                    </form>
+                    <p id="register-message" class="mt-4 text-sm"></p>
+                </div>
+
+                <!-- Form Login -->
+                <div>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Login</h2>
+                    <form id="login-form">
+                        <div class="mb-4">
+                            <label for="login-username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                            <input type="text" id="login-username" name="username" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="login-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                            <input type="password" id="login-password" name="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <button type="submit" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-700 transition duration-300">Login</button>
+                    </form>
+                    <p id="login-message" class="mt-4 text-sm text-red-600"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Area Konten Dinamis -->
+        <div id="content-area">
+            <!-- Konten default (Rute) akan dimuat oleh JS -->
+        </div>
+
+    </main>
+
+    <script>
+        // URL API Anda
+        const API_URL = 'http://localhost:5000/api';
+        const contentArea = document.getElementById('content-area');
+        const token = localStorage.getItem('token'); // Ambil token sekali
+
+        /**
+         * Fungsi untuk mem-parsing token JWT
+         */
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                console.error("Gagal mem-parsing JWT:", e);
+                return null;
+            }
+        }
+
+        /**
+         * Memperbarui UI di pojok kanan atas berdasarkan status login.
+         */
+        function updateAuthUI() {
+            const authContainer = document.getElementById('auth-container');
+            if (token) {
+                const payload = parseJwt(token);
+                const username = payload.username || 'Pengguna'; 
+
+                authContainer.innerHTML = `
+                    <span class="text-gray-700">Selamat datang, <strong class="font-medium">${username}</strong>!</span>
+                    <button id="logout-btn" class="bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-red-600 transition duration-300">
+                        Logout
+                    </button>
+                `;
+                document.getElementById('logout-btn').addEventListener('click', () => {
+                    localStorage.removeItem('token');
+                    location.reload(); 
+                });
+            } else {
+                authContainer.innerHTML = `
+                    <button id="login-register-btn" class="bg-blue-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-blue-600 transition duration-300">
+                        Login / Register
+                    </button>
+                `;
+                document.getElementById('login-register-btn').addEventListener('click', () => {
+                    document.getElementById('forms-section').classList.toggle('hidden');
+                });
+            }
+        }
+        
+        // --- Fungsi Navigasi ---
+        
+        function updateActiveNav(activeId) {
+            const navIds = ['routes', 'stops', 'buses'];
+            navIds.forEach(id => {
+                const button = document.getElementById(`nav-${id}`);
+                button.classList.remove('text-blue-600', 'border-blue-600');
+                button.classList.add('text-gray-500', 'hover:text-gray-800', 'border-transparent', 'hover:border-gray-300');
+            });
+            
+            const activeButton = document.getElementById(`nav-${activeId}`);
+            activeButton.classList.add('text-blue-600', 'border-blue-600');
+            activeButton.classList.remove('text-gray-500', 'hover:text-gray-800', 'border-transparent', 'hover:border-gray-300');
+        }
+
+        // --- Fungsi untuk Render Tabel ---
+        
+        function renderRoutesTable(routes) {
+            let tableRows = '';
+            if (routes && routes.length > 0) {
+                routes.forEach(route => {
+                    const statusBadge = route.isActive
+                        ? `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Aktif</span>`
+                        : `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Tidak Aktif</span>`;
+
+                    tableRows += `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${route.name}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${route.description}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${route.origin}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${route.destination}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tableRows = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Tidak ada data rute yang ditemukan.</td></tr>`;
+            }
+
+            contentArea.innerHTML = `
+                <h2 class="text-3xl font-semibold text-gray-800 mb-6">Daftar Rute Publik</h2>
+                <!-- [FIX] Ganti overflow-hidden -> overflow-x-auto -->
+                <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Nama Rute</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Deskripsi</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Asal</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Tujuan</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">${tableRows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderStopsTable(stops) {
+            let tableRows = '';
+            if (stops && stops.length > 0) {
+                stops.forEach(stop => {
+                    const name = stop.name || 'N/A';
+                    const address = stop.address || 'N/A'; 
+                    
+                    let facilitiesList = [];
+                    if (stop.facilities) {
+                        for (const [key, value] of Object.entries(stop.facilities)) {
+                            if (value === true) {
+                                const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                                facilitiesList.push(formattedKey);
+                            }
+                        }
+                    }
+                    const facilitiesDisplay = facilitiesList.length > 0 ? facilitiesList.join(', ') : 'Tidak ada';
+
+                    tableRows += `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${name}</td>
+                            <td class="px-6 py-4 whitespace-normal text-sm text-gray-600">${address}</td>
+                            <td class="px-6 py-4 whitespace-normal text-sm text-gray-600">${facilitiesDisplay}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tableRows = `<tr><td colspan="3" class="px-6 py-4 text-center text-gray-500">Tidak ada data halte yang ditemukan.</td></tr>`;
+            }
+
+            contentArea.innerHTML = `
+                <h2 class="text-3xl font-semibold text-gray-800 mb-6">Daftar Halte Publik</h2>
+                <!-- [FIX] Ganti overflow-hidden -> overflow-x-auto -->
+                <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Nama Halte</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Alamat</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Fasilitas</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">${tableRows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderBusesTable(buses) {
+            let tableRows = '';
+            if (buses && buses.length > 0) {
+                buses.forEach(bus => {
+                    const nomorPolisi = bus.nomor_polisi || 'N/A';
+                    const kapasitas = bus.kapasitas_penumpang || 'N/A';
+                    const model = bus.model_kendaraan || 'N/A';
+                    
+                    // [MODIFIKASI] Logika baru untuk status operasional (string)
+                    let statusBadge = '';
+                    const statusText = bus.operational_status || 'N/A';
+                    
+                    switch(statusText) {
+                        case 'Available':
+                            statusBadge = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Available</span>`;
+                            break;
+                        case 'In Service':
+                            statusBadge = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">In Service</span>`;
+                            break;
+                        case 'Maintenance':
+                            statusBadge = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Maintenance</span>`;
+                            break;
+                        case 'Out of Service':
+                            statusBadge = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Out of Service</span>`;
+                            break;
+                        default:
+                            statusBadge = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">${statusText}</span>`;
+                    }
+                    // [MODIFIKASI] Akhir
+
+                    const namaRute = (bus.route && bus.route.routeName) ? bus.route.routeName : 'N/A';
+
+                    tableRows += `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${nomorPolisi}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${kapasitas}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${model}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${namaRute}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tableRows = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Tidak ada data bus yang ditemukan.</td></tr>`;
+            }
+
+            contentArea.innerHTML = `
+                <h2 class="text-3xl font-semibold text-gray-800 mb-6">Daftar Bus Publik</h2>
+                <!-- [FIX] Ganti overflow-hidden -> overflow-x-auto -->
+                <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Nomor Polisi</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Kapasitas</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Model Kendaraan</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status Operasional</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Nama Rute</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">${tableRows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+
+        // --- Fungsi untuk Fetch Data ---
+
+        async function fetchRoutes() {
+            updateActiveNav('routes');
+            contentArea.innerHTML = `<p class="text-center text-gray-500 py-10">Memuat data rute...</p>`;
+            try {
+                const response = await fetch(`${API_URL}/route/routes`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                renderRoutesTable(data.routes); 
+            } catch (error) {
+                console.error('Error fetching routes:', error);
+                contentArea.innerHTML = `<p class="text-center text-red-500 py-10">Gagal memuat data rute.</p>`;
+            }
+        }
+        
+        async function fetchStops() {
+            updateActiveNav('stops');
+            contentArea.innerHTML = `<p class="text-center text-gray-500 py-10">Memuat data halte...</p>`;
+            try {
+                const response = await fetch(`${API_URL}/stop/stops`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                renderStopsTable(data.stops); 
+            } catch (error) {
+                console.error('Error fetching stops:', error);
+                contentArea.innerHTML = `<p class="text-center text-red-500 py-10">Gagal memuat data halte.</p>`;
+            }
+        }
+        
+        async function fetchBuses() {
+            updateActiveNav('buses');
+            contentArea.innerHTML = `<p class="text-center text-gray-500 py-10">Memuat data bus...</p>`;
+            try {
+                const response = await fetch(`${API_URL}/bus/buses`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                renderBusesTable(data.buses); 
+            } catch (error) {
+                console.error('Error fetching buses:', error);
+                contentArea.innerHTML = `<p class="text-center text-red-500 py-10">Gagal memuat data bus.</p>`;
+            }
+        }
+        
+        // --- Fungsi Form Login/Register ---
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            const messageEl = document.getElementById('register-message');
+
+            try {
+                const response = await fetch(`${API_URL}/user/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    messageEl.textContent = 'Registrasi berhasil! Silakan login.';
+                    messageEl.className = 'mt-4 text-sm text-green-600';
+                    form.reset();
+                } else {
+                    messageEl.textContent = `Error: ${result.message || 'Registrasi gagal'}`;
+                    messageEl.className = 'mt-4 text-sm text-red-600';
+                }
+            } catch (error) {
+                console.error('Error registering:', error);
+                messageEl.textContent = 'Terjadi kesalahan jaringan.';
+                messageEl.className = 'mt-4 text-sm text-red-600';
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            const messageEl = document.getElementById('login-message');
+
+            try {
+                const response = await fetch(`${API_URL}/user/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                
+                // [MODIFIKASI] Logika baru setelah login sukses
+                if (response.ok && result.token) {
+                    // 1. Simpan token
+                    localStorage.setItem('token', result.token);
+                    
+                    // 2. Parse token untuk cek role
+                    const payload = parseJwt(result.token);
+                    
+                    // 3. Cek role dan redirect
+                    if (payload && payload.role === 'admin') {
+                        // Jika admin, redirect ke admin.html
+                        // Browser akan memuat halaman admin.html
+                        window.location.href = '/admin.html';
+                    } else {
+                        // Jika user biasa, reload halaman index
+                        // Ini akan menjalankan updateAuthUI() dan menampilkan tabel
+                        location.reload();
+                    }
+                } else {
+                    messageEl.textContent = `Error: ${result.message || 'Username atau password salah'}`;
+                }
+            } catch (error) {
+                console.error('Error logging in:', error);
+                messageEl.textContent = 'Terjadi kesalahan jaringan.';
+            }
+        }
+
+        /**
+         * Fungsi utama yang dijalankan saat halaman dimuat.
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Siapkan UI otentikasi (pojok kanan atas)
+            updateAuthUI();
+            
+            // 2. Ambil data Rute (sebagai default)
+            fetchRoutes();
+
+            // 3. Pasang event listener ke form
+            document.getElementById('register-form').addEventListener('submit', handleRegister);
+            document.getElementById('login-form').addEventListener('submit', handleLogin);
+            
+            // 4. Pasang event listener ke tombol navigasi tabel
+            document.getElementById('nav-routes').addEventListener('click', fetchRoutes);
+            document.getElementById('nav-stops').addEventListener('click', fetchStops);
+            document.getElementById('nav-buses').addEventListener('click', fetchBuses);
+        });
+
+    </script>
+
+</body>
+</html>

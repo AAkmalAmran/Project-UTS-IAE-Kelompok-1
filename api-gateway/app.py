@@ -1,12 +1,34 @@
 import os
 import requests
-from flask import Flask, request, jsonify, Response
+import jwt 
+from flask import Flask, request, jsonify, Response, send_from_directory, g
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 load_dotenv()
-app = Flask(__name__)
 
-# 1. Ambil "peta" alamat service dari .env
+app = Flask(
+    __name__,
+    static_folder='frontend',
+    static_url_path=''
+)
+CORS(app) 
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
+if not app.config["JWT_SECRET_KEY"]:
+    raise ValueError("JWT_SECRET_KEY tidak diatur di environment variables. Tambahkan ke file .env")
+
+PUBLIC_PATHS = [
+    '/',                      
+    '/index.html',            
+    '/admin.html',           
+    '/api/user/login',
+    '/api/user/register',
+    '/api/route/routes',
+    '/api/stop/stops',
+    '/api/bus/buses',
+    '/api/schedule/schedules'
+]
+
 SERVICE_URLS = {
     "user": os.environ.get("USER_SERVICE_URL"),      # http://service-user:5001
     "route": os.environ.get("ROUTE_SERVICE_URL"),     # http://service-1-route:5002
@@ -15,13 +37,56 @@ SERVICE_URLS = {
     "schedule": os.environ.get("SCHEDULE_SERVICE_URL")# http://service-4-schedule:5005
 }
 
-# 2. Fungsi utama untuk meneruskan request
+# --- Hook Validasi JWT ---
+@app.before_request
+def require_jwt_authentication():
+    """
+    Hook ini berjalan sebelum SETIAP request.
+    """
+    # 1. Cek apakah path request ada di daftar publik
+    if request.path in PUBLIC_PATHS:
+        return  # Lewati pemeriksaan, lanjutkan ke rute
+
+    # 2. Dapatkan dan validasi token JWT
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({"error": "Authorization header is missing"}), 401
+
+    try:
+        parts = auth_header.split()
+        if parts[0].lower() != 'bearer' or len(parts) != 2:
+            raise ValueError("Format header Authorization tidak valid")
+
+        token = parts[1]
+        payload = jwt.decode(
+            token,
+            app.config['JWT_SECRET_KEY'],
+            algorithms=['HS256']
+        )
+        g.user_payload = payload
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token has expired"}), 401
+    except (jwt.InvalidTokenError, ValueError) as e:
+        return jsonify({"error": "Invalid token", "details": str(e)}), 401
+
+    # 3. Validasi Role Admin
+    if '/admin' in request.path:
+        if request.path == '/admin.html':
+            return
+
+        role = g.user_payload.get('role')
+        if role != 'admin':
+            return jsonify({"error": "Admin access required for this resource"}), 403
+    return
+
+
+# 2. Fungsi forwarder 
 def forward_to_service(service_name, path):
     """
     Menerima request dari client dan meneruskannya (forward)
     ke service internal yang sesuai.
     """
-    
     # Dapatkan URL service dari "peta"
     base_url = SERVICE_URLS.get(service_name)
     if not base_url:
@@ -29,7 +94,7 @@ def forward_to_service(service_name, path):
 
     # Gabungkan URL service dengan sisa path dari request
     full_url = f"{base_url}/{path}"
-    
+
     headers = {k: v for k, v in request.headers.items() if k.lower() != 'host'}
 
     try:
@@ -45,12 +110,12 @@ def forward_to_service(service_name, path):
 
         # 3. Buat respons baru untuk dikirim kembali ke client
         excluded_headers = ['content-encoding', 'transfer-encoding', 'connection', 'content-length']
-        
+
         response_headers = [
             (k, v) for k, v in resp.headers.items()
             if k.lower() not in excluded_headers
         ]
-        
+
         response = Response(resp.content, resp.status_code, response_headers)
         return response
 
@@ -59,47 +124,39 @@ def forward_to_service(service_name, path):
     except requests.exceptions.Timeout:
         return jsonify({"error": f"Service '{service_name}' timed out"}), 504
 
-# === Tentukan Rute Gateway ===
-@app.route('/', methods=['GET'])
-def gateway_index():
-    """Halaman root dari gateway itu sendiri."""
-    return jsonify({
-        "message": "Welcome to the API Gateway",
-        "info": "Requests are routed based on URL prefix.",
-        "prefixes": [
-            "/api/user/<path>",
-            "/api/route/<path>",
-            "/api/stop/<path>",
-            "/api/bus/<path>",
-            "/api/schedule/<path>",
-        ]
-    })
+# === Rute Gateway ===
 
-# Semua request ke /api/user/* akan diteruskan ke SERVICE_USER_URL
+@app.route('/admin.html')
+def admin_page():
+    """Melayani halaman admin.html"""
+    return send_from_directory(app.static_folder, 'admin.html')
+
+@app.route('/')
+def index_page():
+    """Melayani halaman index.html"""
+    return send_from_directory(app.static_folder, 'index.html')
+
+# --- Rute Forwarding ---
 @app.route('/api/user/', defaults={'path': ''})
 @app.route('/api/user/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def user_service(path):
     return forward_to_service("user", path)
 
-# Semua request ke /api/route/* akan diteruskan ke SERVICE_ROUTE_URL
 @app.route('/api/route/', defaults={'path': ''})
 @app.route('/api/route/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def route_service(path):
     return forward_to_service("route", path)
 
-# Semua request ke /api/stop/* akan diteruskan ke SERVICE_STOP_URL
 @app.route('/api/stop/', defaults={'path': ''})
 @app.route('/api/stop/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def stop_service(path):
     return forward_to_service("stop", path)
 
-# Semua request ke /api/bus/* akan diteruskan ke SERVICE_BUS_URL
 @app.route('/api/bus/', defaults={'path': ''})
 @app.route('/api/bus/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def bus_service(path):
     return forward_to_service("bus", path)
 
-# Semua request ke /api/schedule/* akan diteruskan ke SERVICE_SCHEDULE_URL
 @app.route('/api/schedule/', defaults={'path': ''})
 @app.route('/api/schedule/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def schedule_service(path):

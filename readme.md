@@ -14,7 +14,7 @@
 ### **1. Clone Repository**
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/AAkmalAmran/Project-UTS-IAE-Kelompok-1.git
 ```
 
 ### **2. Konfigurasi File ENV**

@@ -3,6 +3,29 @@
 
 services:
   # --------------------------------
+  # API Gateway (Port 8080)
+  # --------------------------------
+  api-gateway:
+    build:
+      context: ./api-gateway
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - ROUTE_SERVICE_URL=http://service-1-route:5002
+      - STOP_SERVICE_URL=http://service-2-stop:5003
+      - BUS_SERVICE_URL=http://service-3-bus:5004
+      - SCHEDULE_SERVICE_URL=http://service-4-schedule:5005
+      - USER_SERVICE_URL=http://service-user:5001
+    depends_on:
+      - service-1-route
+      - service-2-stop
+      - service-3-bus
+      - service-4-schedule
+      - service-user
+    networks:
+      - my_app_network
+  # --------------------------------
   # Service User (Port 5001)
   # --------------------------------
   service-user:
@@ -27,9 +50,10 @@ services:
       - "5002:5002" # Ganti dengan port service-1
     env_file:
       - ./service-1-route/.env # Tiap service punya .env sendiri
+    volumes:
+      - ./service-1-route/instance:/app/instance # Simpan data DB
     networks:
       - my_app_network
-    # (Tambahkan 'volumes' jika service-1 juga butuh menyimpan file)
 
   # --------------------------------
   # Service 2: Stop
@@ -71,15 +95,14 @@ services:
       - "5005:5005" # Ganti dengan port service-4
     env_file:
       - ./service-4-schedule/.env
+    volumes:
+      - ./service-4-schedule/instance:/app/instance # Simpan data DB
     networks:
       - my_app_network
 
 # --------------------------------
 # Jaringan (Network)
 # --------------------------------
-# Ini membuat 'jaringan virtual' privat agar semua
-# container bisa saling memanggil menggunakan NAMA SERVICE-nya.
-# (Contoh: dari api-gateway, Anda bisa memanggil http://service-user:5001)
 networks:
   my_app_network:
     driver: bridge

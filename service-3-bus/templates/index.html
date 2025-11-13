@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Service - Tracking Bus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #4facfe;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #4facfe;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4facfe;
+        }
+
+        .bus-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .bus-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bus-card::before {
+            content: '🚌';
+            position: absolute;
+            right: -20px;
+            top: -20px;
+            font-size: 100px;
+            opacity: 0.1;
+        }
+
+        .bus-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .bus-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .bus-model {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .bus-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .status-online {
+            background: #28a745;
+        }
+
+        .status-offline {
+            background: #dc3545;
+        }
+
+        .status-in-service {
+            background: #17a2b8;
+        }
+
+        .status-maintenance {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .status-available {
+            background: #28a745;
+        }
+
+        .route-info {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: white;
+            color: #4facfe;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .filter-btn:hover {
+            background: #4facfe;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: #4facfe;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚌 Bus Service</h1>
+            <p>Sistem Tracking & Manajemen Bus Real-time</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalBuses">0</div>
+                <div class="stat-label">Total Bus</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="onlineCount">0</div>
+                <div class="stat-label">GPS Online</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="inServiceCount">0</div>
+                <div class="stat-label">In Service</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avgSpeed">0</div>
+                <div class="stat-label">Avg Speed (km/h)</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Filter Bus</h2>
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterBuses('all')">Semua Bus</button>
+                <button class="filter-btn" onclick="filterBuses('In Service')">In Service</button>
+                <button class="filter-btn" onclick="filterBuses('Available')">Available</button>
+                <button class="filter-btn" onclick="filterBuses('Maintenance')">Maintenance</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Daftar Bus</h2>
+            <div id="busList" class="bus-grid">
+                <div class="loading">Memuat data bus...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allBuses = [];
+        let currentFilter = 'all';
+
+        async function loadBuses() {
+            try {
+                const response = await fetch('/buses');
+                const data = await response.json();
+                
+                if (data.buses && data.buses.length > 0) {
+                    allBuses = data.buses;
+                    displayBuses(allBuses);
+                    updateStats(allBuses);
+                } else {
+                    document.getElementById('busList').innerHTML = 
+                        '<p style="text-align: center; color: #666;">Tidak ada bus tersedia.</p>';
+                }
+            } catch (error) {
+                document.getElementById('busList').innerHTML = 
+                    '<div class="error">Gagal memuat data bus. Pastikan server berjalan.</div>';
+                console.error('Error:', error);
+            }
+        }
+
+        function displayBuses(buses) {
+            const busList = document.getElementById('busList');
+            busList.innerHTML = '';
+
+            if (buses.length === 0) {
+                busList.innerHTML = '<p style="text-align: center; color: #666;">Tidak ada bus yang cocok dengan filter.</p>';
+                return;
+            }
+
+            buses.forEach(bus => {
+                const busCard = document.createElement('div');
+                busCard.className = 'bus-card';
+                
+                const gpsStatusClass = bus.status_gps === 'Online' ? 'status-online' : 'status-offline';
+                const operationalClass = `status-${bus.operational_status.toLowerCase().replace(' ', '-')}`;
+                
+                let routeHtml = '';
+                if (bus.route) {
+                    routeHtml = `
+                        <div class="route-info">
+                            📍 Rute: ${bus.route.routeName}
+                        </div>
+                    `;
+                }
+                
+                busCard.innerHTML = `
+                    <div class="bus-number">${bus.nomor_polisi}</div>
+                    <div class="bus-model">${bus.model_kendaraan || 'Model tidak tersedia'}</div>
+                    
+                    <div class="bus-info">
+                        <div class="info-row">
+                            <span>Kapasitas:</span>
+                            <span>${bus.kapasitas_penumpang} orang</span>
+                        </div>
+                        <div class="info-row">
+                            <span>GPS Status:</span>
+                            <span class="status-badge ${gpsStatusClass}">${bus.status_gps}</span>
+                        </div>
+                        <div class="info-row">
+                            <span>Status Operasional:</span>
+                            <span class="status-badge ${operationalClass}">${bus.operational_status}</span>
+                        </div>
+                        ${bus.speed ? `
+                        <div class="info-row">
+                            <span>Kecepatan Rata-rata:</span>
+                            <span>${bus.speed.average} km/h</span>
+                        </div>
+                        <div class="info-row">
+                            <span>Kecepatan Saat Ini:</span>
+                            <span>${bus.speed.current} km/h</span>
+                        </div>
+                        ` : ''}
+                        <div class="info-row">
+                            <span>Lokasi:</span>
+                            <span>${bus.lokasi_geografis.latitude.toFixed(4)}, ${bus.lokasi_geografis.longitude.toFixed(4)}</span>
+                        </div>
+                    </div>
+                    
+                    ${routeHtml}
+                `;
+                
+                busList.appendChild(busCard);
+            });
+        }
+
+        function updateStats(buses) {
+            document.getElementById('totalBuses').textContent = buses.length;
+            
+            const onlineCount = buses.filter(b => b.status_gps === 'Online').length;
+            document.getElementById('onlineCount').textContent = onlineCount;
+            
+            const inServiceCount = buses.filter(b => b.operational_status === 'In Service').length;
+            document.getElementById('inServiceCount').textContent = inServiceCount;
+            
+            const avgSpeed = buses.reduce((sum, b) => sum + (b.speed?.average || 0), 0) / buses.length;
+            document.getElementById('avgSpeed').textContent = avgSpeed.toFixed(1);
+        }
+
+        function filterBuses(status) {
+            currentFilter = status;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (status === 'all') {
+                displayBuses(allBuses);
+            } else {
+                const filtered = allBuses.filter(bus => bus.operational_status === status);
+                displayBuses(filtered);
+            }
+        }
+
+        // Auto refresh every 30 seconds
+        setInterval(loadBuses, 30000);
+
+        window.onload = loadBuses;
+    </script>
+</body>
+</html>

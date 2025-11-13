@@ -1,14 +1,9 @@
-# service-user/Dockerfile
-
-# 1. Mulai dari base image Python yang ringan
-FROM python:3.12-slim
+FROM python:3.10-slim
 
 # 2. Set folder kerja di dalam container
 WORKDIR /app
 
 # 3. Copy file requirements DULU dan install
-#    Ini memanfaatkan Docker cache. Jika requirements.txt tidak berubah,
-#    langkah ini akan di-skip saat build ulang, jadi lebih cepat.
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
@@ -24,5 +19,4 @@ RUN mkdir -p /app/instance && \
 EXPOSE 5001
 
 # 7. Perintah untuk menjalankan aplikasi saat container dimulai
-#    Kita menggunakan variabel dari .env yang akan di-inject oleh Docker Compose
 CMD ["flask", "run", "--host=0.0.0.0", "--port=5001"]

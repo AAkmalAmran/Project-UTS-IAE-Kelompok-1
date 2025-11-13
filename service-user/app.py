@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from flask import Flask, jsonify, request, g # Tambahkan 'g'
+from flask import Flask, jsonify, request, g, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from dotenv import load_dotenv
@@ -27,11 +27,8 @@ JWT_SECRET = os.environ.get("JWT_SECRET", "default-secret-key")
 JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM", "HS256")
 TOKEN_TTL_MINUTES = int(os.environ.get("TOKEN_TTL_MINUTES", 30))
 
-# --- PERBAIKAN: Masukkan JWT_SECRET ke app.config ---
-# Agar bisa diakses secara konsisten di semua tempat
 app.config['JWT_SECRET'] = JWT_SECRET
 app.config['JWT_ALGORITHM'] = JWT_ALGORITHM
-# (SECRET_KEY Flask berbeda dari JWT_SECRET)
 app.config['SECRET_KEY'] = os.environ.get("FLASK_SECRET_KEY", "flask-fallback-key")
 
 
@@ -55,15 +52,13 @@ class User(db.Model):
 def generate_token(username: str, role: str) -> str:
     """Membuat JWT token baru."""
     payload = {
-        "sub": username, # 'sub' adalah username
+        "sub": username,
         "role": role,
         "exp": datetime.utcnow() + timedelta(minutes=TOKEN_TTL_MINUTES),
         "iat": datetime.utcnow(),
     }
-    # Gunakan JWT_SECRET dari app.config
     return jwt.encode(payload, app.config['JWT_SECRET'], algorithm=app.config['JWT_ALGORITHM'])
 
-# === PERBAIKAN DECORATOR ===
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -77,7 +72,6 @@ def token_required(f):
         if not token:
             return jsonify({'message': 'Token is missing!'}), 401
 
-        # (Kode normalisasi token Anda sudah bagus)
         if isinstance(token, bytes):
             token = token.decode('utf-8')
         token = token.strip().strip('"').strip("'")
@@ -85,30 +79,26 @@ def token_required(f):
             token = token[2:-1]
         
         try:
-            # --- PERBAIKAN 1: Gunakan app.config['JWT_SECRET'] ---
             data = jwt.decode(
                 token, 
                 app.config['JWT_SECRET'], 
                 algorithms=[app.config['JWT_ALGORITHM']]
             )
             
-            # --- PERBAIKAN 2: 'sub' adalah username, bukan id ---
             username = data.get('sub')
             if not username:
-                return jsonify({'message': 'Token is invalid!', 'reason': 'Missing subject (sub)'}), 401
+                return jsonify({'message': 'Token invalid!', 'reason': 'Missing subject (sub)'}), 401
                 
-            # Cari user berdasarkan username
             current_user = User.query.filter_by(username=username).first()
             if not current_user:
                 return jsonify({"error": "User not found"}), 404
             
-            # Simpan user di 'g' untuk request ini
             g.current_user = current_user
             
         except jwt.ExpiredSignatureError:
             return jsonify({"error": "Token expired"}), 401
         except jwt.InvalidTokenError as e:
-            return jsonify({'message': 'Token is invalid!', 'error': str(e)}), 401
+            return jsonify({'message': 'Token invalid!', 'error': str(e)}), 401
 
         # Kirim user yang sudah ditemukan ke fungsi aslinya
         return f(current_user, *args, **kwargs)
@@ -120,14 +110,20 @@ def admin_required(f):
     @wraps(f)
     @token_required
     def decorated_function(current_user, *args, **kwargs):
-        # 'current_user' didapat dari @token_required
         if current_user.role != 'admin':
-            return jsonify({'message': 'Permission denied: Requires admin role.'}), 403
+            return jsonify({'message': 'Permission denied: Anda bukan admin.'}), 403
         return f(current_user, *args, **kwargs)
     return decorated_function
 
 
 # === Routes ===
+
+# WEB UI ENDPOINT
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
 @app.post("/login")
 def login():
     """Autentikasi pengguna dan mengembalikan token."""
@@ -144,7 +140,15 @@ def login():
         return jsonify({"message": "Kredensial tidak valid"}), 401
 
     token = generate_token(user.username, user.role)
-    return jsonify({"access_token": token})
+    return jsonify({
+        "token": token,
+        "access_token": token, 
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "role": user.role
+        }
+    })
 
 @app.post("/register")
 def register():
@@ -165,25 +169,52 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"message": f"User {username} berhasil didaftarkan."}), 201
+    return jsonify({
+        "message": f"User {username} berhasil didaftarkan.",
+        "user": {
+            "id": new_user.id,
+            "username": new_user.username,
+            "role": new_user.role
+        }
+    }), 201
+
+
+@app.get("/admin/users")
+@admin_required
+def get_users():
+    users = User.query.all()
+    return jsonify({
+        "users": [{
+            "id": user.id,
+            "username": user.username,
+            "role": user.role
+        } for user in users]
+    })
+
+
+@app.delete("/users/<int:user_id>")
+def delete_user(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({"message": f"User {user.username} berhasil dihapus"}), 200
 
 
 @app.get("/health")
 def health():
-    """Endpoint untuk mengecek kesehatan layanan."""
     return {"status": "auth service healthy"}
     
-# --- (Contoh penggunaan decorator admin_required di service-user) ---
 @app.get("/admin/test")
 @admin_required
 def admin_test(current_user):
-    # 'current_user' otomatis didapat dari decorator
     return jsonify(message=f"Halo admin {current_user.username}! Anda berhasil masuk.")
 
 @app.get("/verify-admin")
 @token_required
 def verify_admin(current_user):
-    """Endpoint untuk memverifikasi apakah token adalah milik admin."""
     if current_user.role != 'admin':
         return jsonify({'message': 'Permission denied: Requires admin role.'}), 403
     return jsonify({'message': 'Valid admin token', 'username': current_user.username}), 200
@@ -199,7 +230,6 @@ def init_db_command():
     
 @app.cli.command("seed-admin")
 def seed_admin_command():
-    """Membuat user admin default untuk tes."""
     username = "admin"
     password = "admin123"
     

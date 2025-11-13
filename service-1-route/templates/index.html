@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Service - Manajemen Rute</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .route-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .route-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .route-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .route-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .route-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .route-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .route-info {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .route-path {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            color: #444;
+        }
+
+        .route-path span {
+            font-weight: bold;
+        }
+
+        .arrow {
+            color: #667eea;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .stops-list {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .stop-item {
+            padding: 5px 0;
+            color: #555;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚌 Route Service</h1>
+            <p>Sistem Manajemen Rute Transportasi Umum</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalRoutes">0</div>
+                <div class="stat-label">Total Rute</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeRoutes">0</div>
+                <div class="stat-label">Rute Aktif</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Daftar Rute</h2>
+            <div id="routeList" class="route-list">
+                <div class="loading">Memuat data rute...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fetch routes data
+        async function loadRoutes() {
+            try {
+                const response = await fetch('/routes');
+                const data = await response.json();
+                
+                if (data.routes && data.routes.length > 0) {
+                    displayRoutes(data.routes);
+                    updateStats(data.routes);
+                } else {
+                    document.getElementById('routeList').innerHTML = 
+                        '<p style="text-align: center; color: #666;">Tidak ada rute tersedia.</p>';
+                }
+            } catch (error) {
+                document.getElementById('routeList').innerHTML = 
+                    '<div class="error">Gagal memuat data rute. Pastikan server berjalan.</div>';
+                console.error('Error:', error);
+            }
+        }
+
+        function displayRoutes(routes) {
+            const routeList = document.getElementById('routeList');
+            routeList.innerHTML = '';
+
+            routes.forEach(route => {
+                const routeItem = document.createElement('div');
+                routeItem.className = 'route-item';
+                
+                const statusClass = route.is_active ? 'status-active' : 'status-inactive';
+                const statusText = route.is_active ? 'Aktif' : 'Tidak Aktif';
+                
+                routeItem.innerHTML = `
+                    <div class="route-header">
+                        <div class="route-name">${route.name}</div>
+                        <div class="route-status ${statusClass}">${statusText}</div>
+                    </div>
+                    <div class="route-info">${route.description || 'Tidak ada deskripsi'}</div>
+                    <div class="route-path">
+                        <span>${route.origin}</span>
+                        <span class="arrow">→</span>
+                        <span>${route.destination}</span>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="viewStops(${route.routeId})">
+                            Lihat Halte
+                        </button>
+                        <button class="btn btn-secondary" onclick="viewBuses(${route.routeId})">
+                            Lihat Bus
+                        </button>
+                    </div>
+                `;
+                
+                routeList.appendChild(routeItem);
+            });
+        }
+
+        function updateStats(routes) {
+            document.getElementById('totalRoutes').textContent = routes.length;
+            const activeCount = routes.filter(r => r.is_active).length;
+            document.getElementById('activeRoutes').textContent = activeCount;
+        }
+
+        async function viewStops(routeId) {
+            try {
+                const response = await fetch(`/routes/${routeId}/stops`);
+                const data = await response.json();
+                
+                let stopsHtml = '<h3>Halte di Rute Ini:</h3><div class="stops-list">';
+                data.stops.forEach((stop, index) => {
+                    stopsHtml += `<div class="stop-item">${index + 1}. ${stop.stopName}`;
+                    if (stop.distanceToNext) {
+                        stopsHtml += ` → ${stop.distanceToNext} km`;
+                    }
+                    stopsHtml += '</div>';
+                });
+                stopsHtml += '</div>';
+                
+                alert(stopsHtml.replace(/<[^>]*>/g, '\n'));
+            } catch (error) {
+                alert('Gagal memuat data halte');
+            }
+        }
+
+        async function viewBuses(routeId) {
+            try {
+                const response = await fetch(`/routes/${routeId}/buses`);
+                const data = await response.json();
+                
+                if (data.buses && data.buses.length > 0) {
+                    let busesHtml = 'Bus yang melayani rute ini:\n\n';
+                    data.buses.forEach(bus => {
+                        busesHtml += `${bus.nomor_polisi} - ${bus.operational_status}\n`;
+                    });
+                    alert(busesHtml);
+                } else {
+                    alert('Belum ada bus yang ditugaskan ke rute ini');
+                }
+            } catch (error) {
+                alert('Gagal memuat data bus');
+            }
+        }
+
+        // Load routes on page load
+        window.onload = loadRoutes;
+    </script>
+</body>
+</html>

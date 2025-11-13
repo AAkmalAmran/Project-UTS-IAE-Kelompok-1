@@ -1,48 +1,31 @@
 import os
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import requests
 from functools import wraps
 
+# Import models
+from models import db, Bus
+
 # Muat variabel lingkungan dari file .env
 load_dotenv()
 
 # Inisialisasi Aplikasi Flask
-app = Flask(__name__)
+app = Flask(__name__, instance_relative_config=True)
+
+# Memastikan folder instance ada (untuk SQLite)
+os.makedirs(app.instance_path, exist_ok=True)
 
 # Konfigurasi Database
-# Mengambil DATABASE_URL dari file .env
-# Sesuai docker-compose, ini akan ada di /app/instance/bus.db
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///../instance/bus.db')
+db_path = os.path.join(app.instance_path, 'bus.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', f'sqlite:///{db_path}')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
+# URL Route Service
+ROUTE_SERVICE_URL = os.environ.get('ROUTE_SERVICE_URL', 'http://localhost:5002')
 
-# --- Model Database ---
-
-class Bus(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nomor_polisi = db.Column(db.String(20), unique=True, nullable=False)
-    kapasitas_penumpang = db.Column(db.Integer, nullable=False)
-    status_gps = db.Column(db.String(10), default='Offline') # Online/Offline
-    model_kendaraan = db.Column(db.String(50))
-    latitude = db.Column(db.Float, default=0.0)
-    longitude = db.Column(db.Float, default=0.0)
-
-    # Helper function untuk mengubah data model menjadi dictionary (JSON)
-    def to_dict(self):
-        return {
-            'busId': self.id,
-            'nomor_polisi': self.nomor_polisi,
-            'kapasitas_penumpang': self.kapasitas_penumpang,
-            'status_gps': self.status_gps,
-            'model_kendaraan': self.model_kendaraan,
-            'lokasi_geografis': {
-                'latitude': self.latitude,
-                'longitude': self.longitude
-            }
-        }
+db.init_app(app)
 
 # --- Middleware untuk Verifikasi Token JWT ---
 def admin_required(f):
@@ -70,14 +53,31 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# --- Endpoint API Sesuai Arsitektur ---
+# WEB UI ENDPOINT
+@app.route('/')
+def index():
+    """Serve the web UI"""
+    return render_template('index.html')
 
-@app.route('/buses', methods=['POST'])
+# ENDPOINTS
+@app.route('/buses', methods=['GET'])
+def get_all_buses():
+    route_id = request.args.get('route_id', type=int)
+    
+    if route_id:
+        buses = Bus.query.filter_by(route_id=route_id).all()
+    else:
+        buses = Bus.query.all()
+    
+    return jsonify({
+        'total': len(buses),
+        'buses': [bus.to_dict(include_route=True) for bus in buses]
+    }), 200
+
+
+@app.route('/admin/buses/add', methods=['POST'])
 @admin_required
 def register_bus():
-    """
-    POST /buses: Mendaftarkan bus baru ke dalam sistem.
-    """
     data = request.json
     
     # Validasi input
@@ -91,8 +91,10 @@ def register_bus():
     new_bus = Bus(
         nomor_polisi=data['nomor_polisi'],
         kapasitas_penumpang=data['kapasitas_penumpang'],
-        model_kendaraan=data.get('model_kendaraan'), # Ambil jika ada
-        status_gps='Offline' # Bus baru default-nya Offline
+        model_kendaraan=data.get('model_kendaraan'),
+        average_speed=data.get('average_speed', 40.0),  # Default 40 km/jam
+        operational_status='Available',
+        status_gps='Offline'
     )
     
     db.session.add(new_bus)
@@ -102,9 +104,6 @@ def register_bus():
 
 @app.route('/buses/<int:busId>', methods=['GET'])
 def get_bus_detail(busId):
-    """
-    GET /buses/{busId}: Mendapatkan detail dan lokasi bus tertentu.
-    """
     bus = db.session.get(Bus, busId)
     if not bus:
         return jsonify({'error': 'Bus tidak ditemukan.'}), 404
@@ -113,9 +112,6 @@ def get_bus_detail(busId):
 
 @app.route('/buses/<int:busId>/location', methods=['PUT'])
 def update_bus_location(busId):
-    """
-    PUT /buses/{busId}/location: Memperbarui posisi bus secara terus-menerus.
-    """
     bus = db.session.get(Bus, busId)
     if not bus:
         return jsonify({'error': 'Bus tidak ditemukan.'}), 404
@@ -130,25 +126,238 @@ def update_bus_location(busId):
     bus.latitude = data['latitude']
     bus.longitude = data['longitude']
     
+    # Update kecepatan saat ini (dari GPS)
+    if 'current_speed' in data:
+        bus.current_speed = data['current_speed']
+    
     # Update status GPS jika ada di data, jika tidak, set ke 'Online'
     bus.status_gps = data.get('status_gps', 'Online') 
     
     db.session.commit()
     
-    return jsonify(bus.to_dict()), 200
+    return jsonify(bus.to_dict(include_route=True)), 200
+
+
+@app.route('/admin/buses/<int:busId>/route/assign', methods=['PUT'])
+@admin_required
+def assign_bus_to_route(busId):
+    bus = db.session.get(Bus, busId)
+    if not bus:
+        return jsonify({'error': 'Bus tidak ditemukan.'}), 404
+    
+    data = request.json
+    if not data or 'route_id' not in data:
+        return jsonify({'error': 'route_id wajib diisi.'}), 400
+    
+    # Validasi route_id dengan Route Service
+    try:
+        route_response = requests.get(f'{ROUTE_SERVICE_URL}/routes/{data["route_id"]}')
+        if route_response.status_code != 200:
+            return jsonify({'error': 'Route tidak ditemukan di Route Service.'}), 404
+        
+        route_data = route_response.json()
+        
+        # Assign bus ke route
+        bus.route_id = data['route_id']
+        bus.route_name = route_data.get('name', data.get('route_name', ''))
+        bus.operational_status = 'In Service'
+        
+        db.session.commit()
+        
+        return jsonify({
+            'message': f'Bus {bus.nomor_polisi} berhasil di-assign ke {bus.route_name}',
+            'bus': bus.to_dict(include_route=True)
+        }), 200
+        
+    except requests.exceptions.RequestException:
+        # Jika Route Service tidak tersedia, tetap assign tapi dengan warning
+        bus.route_id = data['route_id']
+        bus.route_name = data.get('route_name', f'Route {data["route_id"]}')
+        bus.operational_status = 'In Service'
+        
+        db.session.commit()
+        
+        return jsonify({
+            'message': f'Bus {bus.nomor_polisi} di-assign ke route (Route Service unavailable)',
+            'warning': 'Tidak dapat memvalidasi route_id',
+            'bus': bus.to_dict(include_route=True)
+        }), 200
+
+
+@app.route('/admin/buses/<int:busId>/route/unassign', methods=['DELETE'])
+@admin_required
+def unassign_bus_from_route(busId):
+    bus = db.session.get(Bus, busId)
+    if not bus:
+        return jsonify({'error': 'Bus tidak ditemukan.'}), 404
+    
+    if not bus.route_id:
+        return jsonify({'error': 'Bus tidak sedang di-assign ke rute manapun.'}), 400
+    
+    old_route = bus.route_name
+    bus.route_id = None
+    bus.route_name = None
+    bus.operational_status = 'Available'
+    
+    db.session.commit()
+    
+    return jsonify({
+        'message': f'Bus {bus.nomor_polisi} berhasil di-unassign dari {old_route}',
+        'bus': bus.to_dict()
+    }), 200
+
+
+@app.route('/admin/buses/<int:busId>/speed', methods=['PUT'])
+@admin_required
+def update_bus_speed(busId):
+    bus = db.session.get(Bus, busId)
+    if not bus:
+        return jsonify({'error': 'Bus tidak ditemukan.'}), 404
+    
+    data = request.json
+    if not data or 'average_speed' not in data:
+        return jsonify({'error': 'average_speed wajib diisi.'}), 400
+    
+    bus.average_speed = data['average_speed']
+    db.session.commit()
+    
+    return jsonify({
+        'message': f'Kecepatan rata-rata bus {bus.nomor_polisi} berhasil diupdate',
+        'bus': bus.to_dict(include_route=True)
+    }), 200
+
+
+@app.route('/admin/buses/<int:busId>/status', methods=['PUT'])
+@admin_required
+def update_bus_status(busId):
+    bus = db.session.get(Bus, busId)
+    if not bus:
+        return jsonify({'error': 'Bus tidak ditemukan.'}), 404
+    
+    data = request.json
+    if not data or 'operational_status' not in data:
+        return jsonify({'error': 'operational_status wajib diisi.'}), 400
+    
+    valid_statuses = ['Available', 'In Service', 'Maintenance', 'Out of Service']
+    if data['operational_status'] not in valid_statuses:
+        return jsonify({'error': f'Status harus salah satu dari: {valid_statuses}'}), 400
+    
+    bus.operational_status = data['operational_status']
+    db.session.commit()
+    
+    return jsonify({
+        'message': f'Status bus {bus.nomor_polisi} berhasil diupdate',
+        'bus': bus.to_dict(include_route=True)
+    }), 200
+
+
+@app.route('/routes/<int:routeId>/buses', methods=['GET'])
+def get_buses_by_route(routeId):
+    buses = Bus.query.filter_by(route_id=routeId).all()
+    
+    return jsonify({
+        'routeId': routeId,
+        'total': len(buses),
+        'buses': [bus.to_dict(include_route=True) for bus in buses]
+    }), 200
 
 # --- Perintah CLI untuk setup database ---
 @app.cli.command('init-db')
 def init_db_command():
-    """
-    Perintah untuk menginisialisasi database.
-    (Opsional: tambahkan data seed di sini jika perlu untuk development)
-    """
-    db.create_all()
-    print('Database telah diinisialisasi.')
+    with app.app_context():
+        db.create_all()
+        print('Database Bus telah diinisialisasi.')
 
 
-# Menjalankan server (sesuai port di docker-compose)
+@app.cli.command('seed-buses')
+def seed_buses_command():
+    with app.app_context():
+        # Hapus data lama
+        Bus.query.delete()
+        
+        # Data bus sample
+        buses_data = [
+            {
+                'nomor_polisi': 'B 1234 ABC',
+                'kapasitas_penumpang': 50,
+                'model_kendaraan': 'Mercedes-Benz OH 1526',
+                'average_speed': 45.0,
+                'route_id': 1,
+                'route_name': 'Rute A',
+                'operational_status': 'In Service'
+            },
+            {
+                'nomor_polisi': 'B 5678 DEF',
+                'kapasitas_penumpang': 45,
+                'model_kendaraan': 'Hino RK8',
+                'average_speed': 42.0,
+                'route_id': 1,
+                'route_name': 'Rute A',
+                'operational_status': 'In Service'
+            },
+            {
+                'nomor_polisi': 'B 9012 GHI',
+                'kapasitas_penumpang': 50,
+                'model_kendaraan': 'Scania K310',
+                'average_speed': 48.0,
+                'route_id': 2,
+                'route_name': 'Rute B',
+                'operational_status': 'In Service'
+            },
+            {
+                'nomor_polisi': 'B 3456 JKL',
+                'kapasitas_penumpang': 40,
+                'model_kendaraan': 'Isuzu NQR',
+                'average_speed': 40.0,
+                'route_id': 3,
+                'route_name': 'Koridor 1',
+                'operational_status': 'In Service'
+            },
+            {
+                'nomor_polisi': 'B 7890 MNO',
+                'kapasitas_penumpang': 50,
+                'model_kendaraan': 'Mercedes-Benz OH 1526',
+                'average_speed': 44.0,
+                'operational_status': 'Available'
+            },
+            {
+                'nomor_polisi': 'B 1122 PQR',
+                'kapasitas_penumpang': 45,
+                'model_kendaraan': 'Hino RK8',
+                'average_speed': 43.0,
+                'operational_status': 'Maintenance'
+            }
+        ]
+        
+        for bus_data in buses_data:
+            bus = Bus(
+                nomor_polisi=bus_data['nomor_polisi'],
+                kapasitas_penumpang=bus_data['kapasitas_penumpang'],
+                model_kendaraan=bus_data['model_kendaraan'],
+                average_speed=bus_data['average_speed'],
+                route_id=bus_data.get('route_id'),
+                route_name=bus_data.get('route_name'),
+                operational_status=bus_data['operational_status'],
+                status_gps='Offline',
+                current_speed=0.0
+            )
+            db.session.add(bus)
+        
+        db.session.commit()
+        print(f'{len(buses_data)} Bus berhasil ditambahkan.')
+
+
+# Health check
+@app.route('/health')
+def health_check():
+    return jsonify({
+        'status': 'healthy',
+        'service': 'bus-service',
+        'database': 'connected'
+    })
+
+# Menjalankan server
 if __name__ == '__main__':
-    # Port 5004 agar sesuai dengan docker-compose
+    with app.app_context():
+        db.create_all()
     app.run(debug=True, host='0.0.0.0', port=5004)

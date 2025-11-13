@@ -2,12 +2,78 @@
 
 ## 📌 Deskripsi Proyek
 
+**Public Transportation Tracker Microservices** adalah sebuah sistem perangkat lunak yang dirancang untuk melacak dan mengelola layanan transportasi publik, khususnya bus. Proyek ini dibangun menggunakan arsitektur *microservices*, di mana fungsionalitas inti dipecah menjadi beberapa layanan (services) yang independen namun saling terhubung.
+
+Tujuan utama dari proyek ini adalah untuk menyediakan platform yang memungkinkan pengguna umum melacak bus, melihat jadwal, dan mendapatkan estimasi waktu kedatangan (ETA). Di sisi lain, sistem ini juga menyediakan serangkaian *endpoint* khusus untuk administrator guna mengelola data master operasional, seperti mendaftarkan bus baru, membuat rute, dan mengatur jadwal.
+
+Arsitektur sistem ini terdiri dari beberapa komponen utama:
+* **User Service:** Menangani semua hal terkait autentikasi dan manajemen pengguna, seperti registrasi dan login.
+* **Bus Service:** Mengelola data bus, termasuk penugasan rute dan pembaruan lokasi.
+* **Route Service:** Mengelola informasi rute, termasuk daftar halte (stops) yang ada di dalam setiap rute.
+* **Stop Service:** Bertindak sebagai layanan data master untuk semua informasi halte.
+* **Schedule Service:** Mengelola jadwal keberangkatan bus dan menyediakan fungsionalitas inti untuk menghitung ETA.
+* **API Gateway:** Berfungsi sebagai pintu masuk tunggal yang mengarahkan semua permintaan dari klien (Frontend) ke *service* yang sesuai.
+
+Proyek ini dirancang untuk dijalankan dan dikelola menggunakan **Docker Desktop** dan **Docker Compose**, yang menyederhanakan proses instalasi dan *deployment* semua layanan secara bersamaan.
 
 ---
 
 ## 🏗️ **Arsitektur Sistem**
+```mermaid
 
+graph TB
 
+    Client[Frontend Client] --> Gateway[API Gateway]
+
+    Gateway --> Service1[User Service]
+    Gateway --> Service2[Bus Service]
+    Gateway --> Service3[Stop Service]
+    Gateway --> Service4[Route Service]
+    Gateway --> Service5[Schedule Service]
+
+    Service1 -.->|HTTP Response| Service2
+    Service1 -.->|HTTP Response| Service3
+    Service1 -.->|HTTP Response| Service4
+    Service1 -.->|HTTP Response| Service5
+
+    Service4 <-.->|HTTP Request/Response| Service2
+    Service4 -.->|HTTP Request/Response| Service3
+
+    Service5 <-.->|HTTP Request| Service2
+    Service5 <-.->|HTTP Request| Service3
+    Service5 <-.->|HTTP Request| Service4
+
+    
+
+    subgraph ServiceLayer [Service Layer]
+
+        Service1
+        Service2
+        Service3
+        Service4
+        Service5
+
+    end
+
+    
+
+    subgraph DataLayer [Data Layer]
+
+        DB1[(User.db)]
+        DB2[(Bus.db)]
+        DB3[(Stop.db)]
+        DB4[(Route.db)]
+        DB5[(Schedule.db)]
+
+    end
+
+    Service1 --> DB1
+    Service2 --> DB2
+    Service3 --> DB3
+    Service4 --> DB4
+    Service5 --> DB5
+
+```
 ---
 ## 🚀 **Cara Menjalankan Proyek**
 

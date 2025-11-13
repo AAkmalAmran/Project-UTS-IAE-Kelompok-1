@@ -262,9 +262,27 @@
                     const kapasitas = bus.kapasitas_penumpang || 'N/A';
                     const model = bus.model_kendaraan || 'N/A';
                     
-                    const statusOps = bus.operational_status
-                        ? `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Operasional</span>`
-                        : `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Tidak Operasional</span>`;
+                    // [MODIFIKASI] Logika baru untuk status operasional (string)
+                    let statusBadge = '';
+                    const statusText = bus.operational_status || 'N/A';
+                    
+                    switch(statusText) {
+                        case 'Available':
+                            statusBadge = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Available</span>`;
+                            break;
+                        case 'In Service':
+                            statusBadge = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">In Service</span>`;
+                            break;
+                        case 'Maintenance':
+                            statusBadge = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Maintenance</span>`;
+                            break;
+                        case 'Out of Service':
+                            statusBadge = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Out of Service</span>`;
+                            break;
+                        default:
+                            statusBadge = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">${statusText}</span>`;
+                    }
+                    // [MODIFIKASI] Akhir
 
                     const namaRute = (bus.route && bus.route.routeName) ? bus.route.routeName : 'N/A';
 
@@ -273,7 +291,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${nomorPolisi}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${kapasitas}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${model}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">${statusOps}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${namaRute}</td>
                         </tr>
                     `;
@@ -392,9 +410,25 @@
                     body: JSON.stringify(data)
                 });
                 const result = await response.json();
+                
+                // [MODIFIKASI] Logika baru setelah login sukses
                 if (response.ok && result.token) {
+                    // 1. Simpan token
                     localStorage.setItem('token', result.token);
-                    location.reload(); 
+                    
+                    // 2. Parse token untuk cek role
+                    const payload = parseJwt(result.token);
+                    
+                    // 3. Cek role dan redirect
+                    if (payload && payload.role === 'admin') {
+                        // Jika admin, redirect ke admin.html
+                        // Browser akan memuat halaman admin.html
+                        window.location.href = '/admin.html';
+                    } else {
+                        // Jika user biasa, reload halaman index
+                        // Ini akan menjalankan updateAuthUI() dan menampilkan tabel
+                        location.reload();
+                    }
                 } else {
                     messageEl.textContent = `Error: ${result.message || 'Username atau password salah'}`;
                 }

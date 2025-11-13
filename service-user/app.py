@@ -118,7 +118,6 @@ def admin_required(f):
 
 # === Routes ===
 
-# WEB UI ENDPOINT
 @app.route('/')
 def index():
     return render_template('index.html')

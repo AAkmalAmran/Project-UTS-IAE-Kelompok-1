@@ -1110,40 +1110,17 @@
             `;
             
             try {
-                // Step 1: Ambil semua rute terlebih dahulu
-                const routesResponse = await fetch(`${API_URL}/route/routes`);
-                if (!routesResponse.ok) throw new Error(`HTTP error! status: ${routesResponse.status}`);
-                const routesData = await routesResponse.json();
+                // Menggunakan URL baru sesuai permintaan Anda
+                const response = await fetch(`${API_URL}/schedule/schedules`);
                 
-                if (!routesData.routes || routesData.routes.length === 0) {
-                    contentArea.innerHTML = renderScheduleContent([]);
-                    document.getElementById('schedules-count').textContent = '0';
-                    return;
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-
-                // Step 2: Ambil jadwal untuk setiap rute
-                const allSchedules = [];
-                const routePromises = routesData.routes.map(async (route) => {
-                    try {
-                        const scheduleResponse = await fetch(`${API_URL}/schedule/schedules/${route.id}`);
-                        if (scheduleResponse.ok) {
-                            const scheduleData = await scheduleResponse.json();
-                            if (scheduleData.schedules && scheduleData.schedules.length > 0) {
-                                // Tambahkan informasi rute ke setiap jadwal
-                                scheduleData.schedules.forEach(schedule => {
-                                    schedule.routeName = route.name;
-                                    schedule.routeId = route.id;
-                                });
-                                allSchedules.push(...scheduleData.schedules);
-                            }
-                        }
-                    } catch (error) {
-                        console.error(`Error fetching schedule for route ${route.id}:`, error);
-                    }
-                });
-
-                // Tunggu semua request selesai
-                await Promise.all(routePromises);
+                
+                const data = await response.json();
+                
+                // Asumsi endpoint baru mengembalikan { schedules: [...] }
+                const allSchedules = data.schedules || []; 
 
                 // Simpan data untuk akses di fungsi detail
                 window.allSchedules = allSchedules;

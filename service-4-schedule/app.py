@@ -144,6 +144,15 @@ def index():
 # ENDPOINTS UNTUK USER (PUBLIC)
 # ========================================
 
+@app.route('/schedules', methods=['GET'])
+def get_all_schedules():
+    schedules = Schedule.query.filter_by(is_active=True).all()
+    
+    return jsonify({
+        'total': len(schedules),
+        'schedules': [schedule.to_dict() for schedule in schedules]
+    }), 200
+
 @app.route('/schedules/<int:routeId>', methods=['GET'])
 def get_route_schedules(routeId):
     """

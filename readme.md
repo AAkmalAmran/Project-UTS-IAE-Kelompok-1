@@ -79,7 +79,9 @@ git clone https://github.com/AAkmalAmran/Project-UTS-IAE-Kelompok-1.git
 > 
 > b. Rename file menjadi .env
 > 
-> c. Ubah SECRET_KEY, JWT_SECRET, JWT_SECRET_KEY
+> c. Ubah SECRET_KEY, JWT_SECRET, JWT_SECRET_KEY 
+>
+> d. Patikan JWT_SECRET_KEY di api-gateway sama dengan JWT_SECRET_KEY di service-user
 
 ### **3. Install Docker Desktop**
 > a. Link download: https://www.docker.com/products/docker-desktop/

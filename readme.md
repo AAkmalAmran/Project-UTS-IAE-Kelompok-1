@@ -21,23 +21,23 @@ Proyek ini dirancang untuk dijalankan dan dikelola menggunakan **Docker Desktop*
 ## 🏗️ **Arsitektur Sistem**
 ```mermaid
 
-graph TB
-
 flowchart TB
- subgraph ServiceLayer["Service Layer"]
+    subgraph ServiceLayer["Service Layer"]
         Service1["User Service"]
         Service2["Bus Service"]
         Service3["Stop Service"]
         Service4["Route Service"]
         Service5["Schedule Service"]
-  end
- subgraph DataLayer["Data Layer"]
+    end
+
+    subgraph DataLayer["Data Layer"]
         DB1[("User.db")]
         DB2[("Bus.db")]
         DB3[("Stop.db")]
         DB4[("Route.db")]
         DB5[("Schedule.db")]
-  end
+    end
+
     Client["Frontend Client"] --> Gateway["API Gateway"]
     Gateway --> Service1 & Service2 & Service3 & Service4 & Service5
     Service1 -. HTTP Response .-> Service2 & Service3 & Service4 & Service5
@@ -51,7 +51,7 @@ flowchart TB
     Service5 --> DB5
 
     style Client fill:#00C853,color:#000000
-    style Gateway fill:#FFD600
+    style Gateway fill:#FFD600,color:#000000
     style DataLayer fill:#BBDEFB
     style ServiceLayer color:#000000
     linkStyle 6 stroke:#D50000,fill:none
@@ -63,7 +63,6 @@ flowchart TB
     linkStyle 12 stroke:#AA00FF,fill:none
     linkStyle 13 stroke:#AA00FF,fill:none
     linkStyle 14 stroke:#AA00FF,fill:none
-
 ```
 ---
 ## 🚀 **Cara Menjalankan Proyek**

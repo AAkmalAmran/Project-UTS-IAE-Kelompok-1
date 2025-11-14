@@ -224,13 +224,16 @@ docker-compose run --rm service-4-schedule flask seed-schedules
 Dokumentasi endpoint lengkap ada di folder:
 
 ```
-docs/api/
+docs/API documentation/
 ```
-
 Isi:
+* `Transport System API - Complete.postman_collection.json`
 
-* `Transport System API Documentation.postman_collection.json`
-* `erd.png`
+Diagram sistem lengkap ada di folder:
+```
+docs/architecture/
+```
+Isi:
 * `architecture-diagram.png`
 
 ---

@@ -195,6 +195,7 @@ docker-compose run --rm service-4-schedule flask seed-schedules
 | Method | Endpoint | Deskripsi |
 | ------- | ---------------------------- | ------------------------------ |
 | GET | `/` | Menampilkan halaman utama web (index.html). |
+| GET | `/schedules` | Mengambil semua daftar jadwal keberangkatan bus. |
 | GET | `/schedules/<int:routeId>` | Mengambil daftar jadwal keberangkatan bus untuk rute tertentu. |
 | GET | `/eta?busId=<busId>&stopId=<stopId>` | Menghitung ETA (perkiraan waktu kedatangan) bus tertentu ke halte tertentu. |
 | GET | `/stops/<int:stopId>/arrivals` | Mengambil daftar bus yang akan tiba di halte tertentu beserta ETA-nya. |

@@ -3,15 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Admin Dashboard - Trans Pasundan</title>
     <!-- Muat Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Menggunakan font Inter yang modern */
         body {
             font-family: 'Inter', sans-serif;
         }
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        /* Animasi fade in */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
         
         /* Style untuk kotak pesan kustom */
         #message-box {
@@ -27,131 +38,190 @@
             opacity: 1;
             transform: translateX(0);
         }
+
+        /* Card hover effect */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #3b82f6;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Gradient background konsisten biru */
+        .gradient-blue {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        
+        .gradient-blue-light {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1d4ed8;
+        }
+
+        /* Pulse animation for active elements */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+
+        /* Form focus effects */
+        .form-input:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-available { background: #dbeafe; color: #1e40af; }
+        .status-in-service { background: #dbeafe; color: #1e40af; }
+        .status-maintenance { background: #fef3c7; color: #92400e; }
+        .status-out-of-service { background: #fef2f2; color: #991b1b; }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-50 font-sans">
 
     <!-- Header (Navbar) -->
-    <header class="bg-white shadow-md sticky top-0 z-50">
+    <header class="bg-white shadow-lg sticky top-0 z-50 border-b border-blue-200">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
             
-            <!-- Judul Admin -->
-            <div class="flex items-center space-x-4">
-                <h1 class="text-2xl font-bold text-red-600">Admin Dashboard</h1>
-                <a href="/index.html" class="text-sm text-blue-600 hover:underline">Lihat Halaman Publik</a>
+            <!-- Logo dan Navigasi Utama -->
+            <div class="flex items-center space-x-8">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 gradient-blue rounded-xl flex items-center justify-center shadow-lg pulse-glow">
+                        <i class="fas fa-bus text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-blue-800">Admin Trans Pasundan</h1>
+                        <p class="text-blue-600 text-sm">Sistem Manajemen Transportasi</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex space-x-1 bg-blue-50 rounded-xl p-1">
+                    <button id="nav-buses" class="py-3 px-6 text-sm font-medium text-white gradient-blue rounded-lg transition-all duration-300 shadow-md flex items-center">
+                        <i class="fas fa-bus mr-2"></i>
+                        Armada Bus
+                    </button>
+                    <button id="nav-routes" class="py-3 px-6 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-all duration-300 flex items-center">
+                        <i class="fas fa-route mr-2"></i>
+                        Rute
+                    </button>
+                    <button id="nav-stops" class="py-3 px-6 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-all duration-300 flex items-center">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        Halte
+                    </button>
+                    <button id="nav-schedule" class="py-3 px-6 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-all duration-300 flex items-center">
+                        <i class="fas fa-clock mr-2"></i>
+                        Jadwal
+                    </button>
+                </div>
             </div>
             
-            <!-- Info Pengguna & Logout -->
-            <div id="auth-container" class="space-x-4 flex items-center">
-                <span class="text-gray-700">Selamat datang, <strong id="admin-username" class="font-medium">Admin</strong>!</span>
-                <button id="logout-btn" class="bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-red-600 transition duration-300">
-                    Logout
-                </button>
+            <!-- Info Pengguna & Navigasi -->
+            <div class="flex items-center space-x-4">
+                <a href="/index.html" class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center bg-blue-50 py-2 px-4 rounded-lg transition duration-300 hover:bg-blue-100">
+                    <i class="fas fa-external-link-alt mr-2"></i>
+                    Lihat Publik
+                </a>
+                <div id="auth-container" class="space-x-4 flex items-center">
+                    <div class="flex items-center space-x-3 bg-blue-50 py-2 px-4 rounded-lg">
+                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                            <span class="text-white font-medium text-sm">A</span>
+                        </div>
+                        <div>
+                            <span class="text-blue-700 text-sm">Halo, <strong id="admin-username" class="font-medium">Admin</strong></span>
+                        </div>
+                    </div>
+                    <button id="logout-btn" class="bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-red-600 transition duration-300 shadow-md flex items-center">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        Keluar
+                    </button>
+                </div>
             </div>
         </nav>
     </header>
 
     <!-- Konten Utama -->
     <main class="container mx-auto px-6 py-8">
-        <h2 class="text-3xl font-semibold text-gray-800 mb-6">Manajemen Bus</h2>
 
         <!-- Kotak Pesan Kustom -->
-        <div id="message-box" class="p-4 rounded-md text-white shadow-lg"></div>
+        <div id="message-box" class="p-4 rounded-lg text-white shadow-lg"></div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Statistik Cepat -->
+        <div id="quick-stats" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Stats akan diisi oleh JavaScript -->
+        </div>
 
-            <!-- Form 1: Tambah Bus Baru -->
-            <div class="bg-white p-6 rounded-lg shadow-md space-y-4">
-                <h3 class="text-xl font-semibold">1. Tambah Bus Baru</h3>
-                <form id="add-bus-form" class="space-y-4">
-                    <div>
-                        <label for="add-nomor-polisi" class="block text-sm font-medium text-gray-700">Nomor Polisi</label>
-                        <input type="text" id="add-nomor-polisi" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label for="add-kapasitas" class="block text-sm font-medium text-gray-700">Kapasitas Penumpang</label>
-                        <input type="number" id="add-kapasitas" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label for="add-model" class="block text-sm font-medium text-gray-700">Model Kendaraan</label>
-                        <input type="text" id="add-model" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label for="add-avg-speed" class="block text-sm font-medium text-gray-700">Kecepatan Rata-rata (Avg. Speed)</label>
-                        <input type="number" id="add-avg-speed" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
-                        Tambah Bus
-                    </button>
-                </form>
-            </div>
-
-            <!-- Form 2: Tugaskan Rute -->
-            <div class="bg-white p-6 rounded-lg shadow-md space-y-4">
-                <h3 class="text-xl font-semibold">2. Tugaskan Rute ke Bus</h3>
-                <form id="assign-route-form" class="space-y-4">
-                    <div>
-                        <label for="assign-bus-id" class="block text-sm font-medium text-gray-700">Bus ID</label>
-                        <input type="number" id="assign-bus-id" required placeholder="Contoh: 1" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label for="assign-route-id" class="block text-sm font-medium text-gray-700">Route ID</label>
-                        <input type="number" id="assign-route-id" required placeholder="Contoh: 2" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none">
-                        Tugaskan Rute
-                    </button>
-                </form>
-            </div>
-
-            <!-- Form 3: Update Status Bus -->
-            <div class="bg-white p-6 rounded-lg shadow-md space-y-4">
-                <h3 class="text-xl font-semibold">3. Update Status Bus</h3>
-                <form id="update-status-form" class="space-y-4">
-                    <div>
-                        <label for="status-bus-id" class="block text-sm font-medium text-gray-700">Bus ID</label>
-                        <input type="number" id="status-bus-id" required placeholder="Contoh: 1" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label for="status-operational" class="block text-sm font-medium text-gray-700">Status Operasional</label>
-                        <!-- [MODIFIKASI] Mengganti <select> dengan status string -->
-                        <select id="status-operational" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <option value="Available">Available</option>
-                            <option value="In Service">In Service</option>
-                            <option value="Maintenance">Maintenance</option>
-                            <option value="Out of Service">Out of Service</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none">
-                        Update Status
-                    </button>
-                </form>
-            </div>
-
-            <!-- Form 4: Lepas Rute -->
-            <div class="bg-white p-6 rounded-lg shadow-md space-y-4">
-                <h3 class="text-xl font-semibold">4. Lepas Rute dari Bus</h3>
-                <form id="unassign-route-form" class="space-y-4">
-                    <div>
-                        <label for="unassign-bus-id" class="block text-sm font-medium text-gray-700">Bus ID</label>
-                        <input type="number" id="unassign-bus-id" required placeholder="Contoh: 1" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-700 hover:bg-gray-800 focus:outline-none">
-                        Lepas Rute
-                    </button>
-                </form>
-            </div>
+        <!-- Area Konten Dinamis -->
+        <div id="content-area" class="fade-in">
+            <!-- Konten default (Bus) akan dimuat oleh JS -->
         </div>
 
         <!-- Tampilan Respons API -->
-        <div class="bg-white p-6 rounded-lg shadow-md mt-8">
-            <h2 class="text-xl font-semibold mb-2">Respons API</h2>
-            <pre id="api-response" class="bg-gray-900 text-white text-sm rounded-md p-4 overflow-x-auto min-h-[100px]">... (Menunggu aksi admin)</pre>
+        <div class="bg-white p-6 rounded-xl shadow-lg mt-8 border border-blue-200">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-blue-800 flex items-center">
+                    <i class="fas fa-code mr-2"></i>
+                    Log Respons API
+                </h2>
+                <button id="clear-log" class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                    <i class="fas fa-trash mr-1"></i>
+                    Bersihkan
+                </button>
+            </div>
+            <pre id="api-response" class="bg-blue-50 text-blue-800 text-sm rounded-lg p-4 overflow-x-auto min-h-[100px] max-h-64 border border-blue-200 font-mono">Menunggu aksi admin...</pre>
         </div>
     </main>
 
     <script>
-        // URL API Anda
+        // URL API Gateway
         const API_URL = 'http://localhost:5000/api';
         const token = localStorage.getItem('token');
         let payload = null;
@@ -159,6 +229,8 @@
         // Elemen DOM
         const apiResponse = document.getElementById('api-response');
         const messageBox = document.getElementById('message-box');
+        const contentArea = document.getElementById('content-area');
+        const quickStats = document.getElementById('quick-stats');
 
         /**
          * Fungsi untuk mem-parsing token JWT
@@ -180,13 +252,547 @@
         /** Menampilkan pesan kustom (pengganti alert) */
         function showMessage(message, isError = false) {
             messageBox.textContent = message;
-            messageBox.className = 'p-4 rounded-md text-white shadow-lg '; // Reset kelas
-            messageBox.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
+            messageBox.className = 'p-4 rounded-lg text-white shadow-lg ';
+            messageBox.classList.add(isError ? 'bg-red-500' : 'bg-blue-500');
             messageBox.classList.add('show');
 
             setTimeout(() => {
                 messageBox.classList.remove('show');
-            }, 3000); // Sembunyikan setelah 3 detik
+            }, 4000);
+        }
+
+        /** Update API Response Log */
+        function updateApiResponse(data) {
+            if (typeof data === 'string') {
+                apiResponse.textContent = data;
+            } else {
+                apiResponse.textContent = JSON.stringify(data, null, 2);
+            }
+            apiResponse.scrollTop = apiResponse.scrollHeight;
+        }
+
+        // --- Fungsi Navigasi ---
+        
+        function updateActiveNav(activeId) {
+            const navIds = ['buses', 'routes', 'stops', 'schedule'];
+            navIds.forEach(id => {
+                const button = document.getElementById(`nav-${id}`);
+                button.classList.remove('text-white', 'gradient-blue');
+                button.classList.add('text-blue-600', 'hover:text-blue-800', 'hover:bg-blue-100');
+            });
+            
+            const activeButton = document.getElementById(`nav-${activeId}`);
+            activeButton.classList.remove('text-blue-600', 'hover:text-blue-800', 'hover:bg-blue-100');
+            activeButton.classList.add('text-white', 'gradient-blue');
+        }
+
+        // --- Fungsi untuk Render Quick Stats ---
+        async function renderQuickStats() {
+            try {
+                // Ambil data statistik dari berbagai service
+                const [busesRes, routesRes, stopsRes, schedulesRes] = await Promise.allSettled([
+                    fetch(`${API_URL}/bus/buses`),
+                    fetch(`${API_URL}/route/routes`),
+                    fetch(`${API_URL}/stop/stops`),
+                    fetch(`${API_URL}/schedule/schedules/1`) // Ambil dari rute 1 sebagai contoh
+                ]);
+
+                const stats = {
+                    buses: busesRes.status === 'fulfilled' && busesRes.value.ok ? (await busesRes.value.json()).total : 0,
+                    routes: routesRes.status === 'fulfilled' && routesRes.value.ok ? (await routesRes.value.json()).total : 0,
+                    stops: stopsRes.status === 'fulfilled' && stopsRes.value.ok ? (await stopsRes.value.json()).total : 0,
+                    schedules: schedulesRes.status === 'fulfilled' && schedulesRes.value.ok ? (await schedulesRes.value.json()).total : 0
+                };
+
+                quickStats.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-blue-200 card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-600 text-sm font-medium">Total Armada</p>
+                                <h3 class="text-3xl font-bold text-blue-800">${stats.buses}</h3>
+                            </div>
+                            <div class="w-12 h-12 gradient-blue rounded-lg flex items-center justify-center">
+                                <i class="fas fa-bus text-white text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-blue-200 card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-600 text-sm font-medium">Total Rute</p>
+                                <h3 class="text-3xl font-bold text-blue-800">${stats.routes}</h3>
+                            </div>
+                            <div class="w-12 h-12 gradient-blue rounded-lg flex items-center justify-center">
+                                <i class="fas fa-route text-white text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-blue-200 card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-600 text-sm font-medium">Total Halte</p>
+                                <h3 class="text-3xl font-bold text-blue-800">${stats.stops}</h3>
+                            </div>
+                            <div class="w-12 h-12 gradient-blue rounded-lg flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt text-white text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-blue-200 card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-600 text-sm font-medium">Jadwal Aktif</p>
+                                <h3 class="text-3xl font-bold text-blue-800">${stats.schedules}</h3>
+                            </div>
+                            <div class="w-12 h-12 gradient-blue rounded-lg flex items-center justify-center">
+                                <i class="fas fa-clock text-white text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // --- Fungsi untuk Render Konten Service ---
+
+        // Service: Bus Management
+        function renderBusContent() {
+            return `
+                <div class="mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-3xl font-bold text-blue-800">Manajemen Armada Bus</h2>
+                            <p class="text-blue-600 mt-2">Kelola data armada bus, penugasan rute, dan status operasional</p>
+                        </div>
+                        <div class="w-16 h-16 gradient-blue rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-bus text-white text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                    <!-- Form 1: Tambah Bus Baru -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-200 card-hover">
+                        <h3 class="text-xl font-semibold text-blue-800 mb-6 flex items-center">
+                            <i class="fas fa-plus-circle mr-3 text-blue-600"></i>
+                            Tambah Bus Baru
+                        </h3>
+                        <form id="add-bus-form" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="add-nomor-polisi" class="block text-sm font-medium text-blue-700 mb-2">Nomor Polisi</label>
+                                    <input type="text" id="add-nomor-polisi" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="B 1234 ABC">
+                                </div>
+                                <div>
+                                    <label for="add-kapasitas" class="block text-sm font-medium text-blue-700 mb-2">Kapasitas Penumpang</label>
+                                    <input type="number" id="add-kapasitas" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="50" min="1">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="add-model" class="block text-sm font-medium text-blue-700 mb-2">Model Kendaraan</label>
+                                    <input type="text" id="add-model" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="Mercedes-Benz OH 1526">
+                                </div>
+                                <div>
+                                    <label for="add-avg-speed" class="block text-sm font-medium text-blue-700 mb-2">Kecepatan Rata-rata</label>
+                                    <input type="number" id="add-avg-speed" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="45" min="1">
+                                    <p class="text-xs text-blue-500 mt-1">dalam km/h</p>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full gradient-blue text-white py-4 px-6 rounded-lg font-semibold hover:shadow-lg transition duration-300 flex items-center justify-center shadow-md">
+                                <i class="fas fa-plus mr-3"></i>
+                                Tambah Bus Baru
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Form 2: Tugaskan Rute -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-200 card-hover">
+                        <h3 class="text-xl font-semibold text-blue-800 mb-6 flex items-center">
+                            <i class="fas fa-route mr-3 text-blue-600"></i>
+                            Tugaskan Rute ke Bus
+                        </h3>
+                        <form id="assign-route-form" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="assign-bus-id" class="block text-sm font-medium text-blue-700 mb-2">Bus ID</label>
+                                    <input type="number" id="assign-bus-id" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="1" min="1">
+                                </div>
+                                <div>
+                                    <label for="assign-route-id" class="block text-sm font-medium text-blue-700 mb-2">Route ID</label>
+                                    <input type="number" id="assign-route-id" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="2" min="1">
+                                </div>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                <p class="text-sm text-blue-700 flex items-center">
+                                    <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                                    Pastikan Bus ID dan Route ID sudah terdaftar di sistem
+                                </p>
+                            </div>
+                            <button type="submit" class="w-full gradient-blue text-white py-4 px-6 rounded-lg font-semibold hover:shadow-lg transition duration-300 flex items-center justify-center shadow-md">
+                                <i class="fas fa-link mr-3"></i>
+                                Tugaskan Rute
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Form 3: Update Status Bus -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-200 card-hover">
+                        <h3 class="text-xl font-semibold text-blue-800 mb-6 flex items-center">
+                            <i class="fas fa-sync-alt mr-3 text-blue-600"></i>
+                            Update Status Bus
+                        </h3>
+                        <form id="update-status-form" class="space-y-6">
+                            <div>
+                                <label for="status-bus-id" class="block text-sm font-medium text-blue-700 mb-2">Bus ID</label>
+                                <input type="number" id="status-bus-id" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="1" min="1">
+                            </div>
+                            <div>
+                                <label for="status-operational" class="block text-sm font-medium text-blue-700 mb-2">Status Operasional</label>
+                                <select id="status-operational" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input">
+                                    <option value="">Pilih Status</option>
+                                    <option value="Available">Available</option>
+                                    <option value="In Service">In Service</option>
+                                    <option value="Maintenance">Maintenance</option>
+                                    <option value="Out of Service">Out of Service</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 flex items-center justify-center shadow-md">
+                                <i class="fas fa-edit mr-3"></i>
+                                Update Status
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Form 4: Lepas Rute -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-200 card-hover">
+                        <h3 class="text-xl font-semibold text-blue-800 mb-6 flex items-center">
+                            <i class="fas fa-unlink mr-3 text-blue-600"></i>
+                            Lepas Rute dari Bus
+                        </h3>
+                        <form id="unassign-route-form" class="space-y-6">
+                            <div>
+                                <label for="unassign-bus-id" class="block text-sm font-medium text-blue-700 mb-2">Bus ID</label>
+                                <input type="number" id="unassign-bus-id" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="1" min="1">
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                <p class="text-sm text-blue-700 flex items-center">
+                                    <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                                    Bus akan tersedia untuk penugasan rute baru
+                                </p>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 flex items-center justify-center shadow-md">
+                                <i class="fas fa-unlink mr-3"></i>
+                                Lepas Rute
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Service: Route Management
+        function renderRouteContent() {
+            return `
+                <div class="mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-3xl font-bold text-blue-800">Manajemen Rute Bus</h2>
+                            <p class="text-blue-600 mt-2">Kelola data rute bus dan informasi terkait</p>
+                        </div>
+                        <div class="w-16 h-16 gradient-blue rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-route text-white text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                    <!-- Form: Tambah Rute Baru -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-200 card-hover">
+                        <h3 class="text-xl font-semibold text-blue-800 mb-6 flex items-center">
+                            <i class="fas fa-plus-circle mr-3 text-blue-600"></i>
+                            Tambah Rute Baru
+                        </h3>
+                        <form id="add-route-form" class="space-y-6">
+                            <div>
+                                <label for="route-name" class="block text-sm font-medium text-blue-700 mb-2">Nama Rute</label>
+                                <input type="text" id="route-name" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="Rute A">
+                            </div>
+                            <div>
+                                <label for="route-description" class="block text-sm font-medium text-blue-700 mb-2">Deskripsi</label>
+                                <textarea id="route-description" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" rows="3" placeholder="Deskripsi rute..."></textarea>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="route-origin" class="block text-sm font-medium text-blue-700 mb-2">Asal</label>
+                                    <input type="text" id="route-origin" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="Baleendah">
+                                </div>
+                                <div>
+                                    <label for="route-destination" class="block text-sm font-medium text-blue-700 mb-2">Tujuan</label>
+                                    <input type="text" id="route-destination" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="BEC">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="route-is-active" class="block text-sm font-medium text-blue-700 mb-2">Status</label>
+                                <select id="route-is-active" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input">
+                                    <option value="true">Aktif</option>
+                                    <option value="false">Tidak Aktif</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full gradient-blue text-white py-4 px-6 rounded-lg font-semibold hover:shadow-lg transition duration-300 flex items-center justify-center shadow-md">
+                                <i class="fas fa-plus mr-3"></i>
+                                Tambah Rute
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Form: Update Rute -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-200 card-hover">
+                        <h3 class="text-xl font-semibold text-blue-800 mb-6 flex items-center">
+                            <i class="fas fa-edit mr-3 text-blue-600"></i>
+                            Update Rute
+                        </h3>
+                        <form id="update-route-form" class="space-y-6">
+                            <div>
+                                <label for="update-route-id" class="block text-sm font-medium text-blue-700 mb-2">Route ID</label>
+                                <input type="number" id="update-route-id" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="1" min="1">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="update-route-name" class="block text-sm font-medium text-blue-700 mb-2">Nama Rute</label>
+                                    <input type="text" id="update-route-name" class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input">
+                                </div>
+                                <div>
+                                    <label for="update-route-status" class="block text-sm font-medium text-blue-700 mb-2">Status</label>
+                                    <select id="update-route-status" class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input">
+                                        <option value="">Pilih Status</option>
+                                        <option value="true">Aktif</option>
+                                        <option value="false">Tidak Aktif</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 flex items-center justify-center shadow-md">
+                                <i class="fas fa-save mr-3"></i>
+                                Update Rute
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Service: Stop Management
+        function renderStopContent() {
+            return `
+                <div class="mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-3xl font-bold text-blue-800">Manajemen Halte Bus</h2>
+                            <p class="text-blue-600 mt-2">Kelola data halte dan fasilitas yang tersedia</p>
+                        </div>
+                        <div class="w-16 h-16 gradient-blue rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-map-marker-alt text-white text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                    <!-- Form: Tambah Halte Baru -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-200 card-hover">
+                        <h3 class="text-xl font-semibold text-blue-800 mb-6 flex items-center">
+                            <i class="fas fa-plus-circle mr-3 text-blue-600"></i>
+                            Tambah Halte Baru
+                        </h3>
+                        <form id="add-stop-form" class="space-y-6">
+                            <div>
+                                <label for="stop-name" class="block text-sm font-medium text-blue-700 mb-2">Nama Halte</label>
+                                <input type="text" id="stop-name" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="Halte Baleendah">
+                            </div>
+                            <div>
+                                <label for="stop-address" class="block text-sm font-medium text-blue-700 mb-2">Alamat</label>
+                                <textarea id="stop-address" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" rows="3" placeholder="Alamat lengkap halte..."></textarea>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="stop-latitude" class="block text-sm font-medium text-blue-700 mb-2">Latitude</label>
+                                    <input type="number" step="any" id="stop-latitude" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="-6.9123">
+                                </div>
+                                <div>
+                                    <label for="stop-longitude" class="block text-sm font-medium text-blue-700 mb-2">Longitude</label>
+                                    <input type="number" step="any" id="stop-longitude" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="107.6196">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-blue-700 mb-3">Fasilitas</label>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    <label class="flex items-center p-3 border border-blue-200 rounded-lg hover:bg-blue-50 cursor-pointer transition duration-200">
+                                        <input type="checkbox" name="facilities" value="shelter" class="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                        <span class="text-sm text-blue-700">Shelter</span>
+                                    </label>
+                                    <label class="flex items-center p-3 border border-blue-200 rounded-lg hover:bg-blue-50 cursor-pointer transition duration-200">
+                                        <input type="checkbox" name="facilities" value="seating" class="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                        <span class="text-sm text-blue-700">Seating</span>
+                                    </label>
+                                    <label class="flex items-center p-3 border border-blue-200 rounded-lg hover:bg-blue-50 cursor-pointer transition duration-200">
+                                        <input type="checkbox" name="facilities" value="lighting" class="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                        <span class="text-sm text-blue-700">Lighting</span>
+                                    </label>
+                                    <label class="flex items-center p-3 border border-blue-200 rounded-lg hover:bg-blue-50 cursor-pointer transition duration-200">
+                                        <input type="checkbox" name="facilities" value="wheelchair_access" class="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                        <span class="text-sm text-blue-700">Wheelchair</span>
+                                    </label>
+                                    <label class="flex items-center p-3 border border-blue-200 rounded-lg hover:bg-blue-50 cursor-pointer transition duration-200">
+                                        <input type="checkbox" name="facilities" value="guiding_block" class="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                        <span class="text-sm text-blue-700">Guiding Block</span>
+                                    </label>
+                                    <label class="flex items-center p-3 border border-blue-200 rounded-lg hover:bg-blue-50 cursor-pointer transition duration-200">
+                                        <input type="checkbox" name="facilities" value="digital_eta_display" class="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                        <span class="text-sm text-blue-700">Digital ETA</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full gradient-blue text-white py-4 px-6 rounded-lg font-semibold hover:shadow-lg transition duration-300 flex items-center justify-center shadow-md">
+                                <i class="fas fa-plus mr-3"></i>
+                                Tambah Halte
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Form: Update Halte -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-200 card-hover">
+                        <h3 class="text-xl font-semibold text-blue-800 mb-6 flex items-center">
+                            <i class="fas fa-edit mr-3 text-blue-600"></i>
+                            Update Halte
+                        </h3>
+                        <form id="update-stop-form" class="space-y-6">
+                            <div>
+                                <label for="update-stop-id" class="block text-sm font-medium text-blue-700 mb-2">Stop ID</label>
+                                <input type="number" id="update-stop-id" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="1" min="1">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="update-stop-name" class="block text-sm font-medium text-blue-700 mb-2">Nama Halte</label>
+                                    <input type="text" id="update-stop-name" class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input">
+                                </div>
+                                <div>
+                                    <label for="update-stop-address" class="block text-sm font-medium text-blue-700 mb-2">Alamat</label>
+                                    <textarea id="update-stop-address" class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" rows="2"></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 flex items-center justify-center shadow-md">
+                                <i class="fas fa-save mr-3"></i>
+                                Update Halte
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Service: Schedule Management
+        function renderScheduleContent() {
+            return `
+                <div class="mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-3xl font-bold text-blue-800">Manajemen Jadwal Bus</h2>
+                            <p class="text-blue-600 mt-2">Kelola jadwal keberangkatan dan kedatangan bus</p>
+                        </div>
+                        <div class="w-16 h-16 gradient-blue rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-clock text-white text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                    <!-- Form: Tambah Jadwal Baru -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-200 card-hover">
+                        <h3 class="text-xl font-semibold text-blue-800 mb-6 flex items-center">
+                            <i class="fas fa-plus-circle mr-3 text-blue-600"></i>
+                            Tambah Jadwal Baru
+                        </h3>
+                        <form id="add-schedule-form" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="schedule-route-id" class="block text-sm font-medium text-blue-700 mb-2">Route ID</label>
+                                    <input type="number" id="schedule-route-id" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="1" min="1">
+                                </div>
+                                <div>
+                                    <label for="schedule-bus-id" class="block text-sm font-medium text-blue-700 mb-2">Bus ID</label>
+                                    <input type="number" id="schedule-bus-id" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="1" min="1">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="schedule-bus-number" class="block text-sm font-medium text-blue-700 mb-2">Nomor Bus</label>
+                                    <input type="text" id="schedule-bus-number" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="B 1234 ABC">
+                                </div>
+                                <div>
+                                    <label for="schedule-status" class="block text-sm font-medium text-blue-700 mb-2">Status</label>
+                                    <select id="schedule-status" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input">
+                                        <option value="On Time">On Time</option>
+                                        <option value="Delayed">Delayed</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="schedule-departure" class="block text-sm font-medium text-blue-700 mb-2">Waktu Berangkat</label>
+                                    <input type="time" id="schedule-departure" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input">
+                                </div>
+                                <div>
+                                    <label for="schedule-arrival" class="block text-sm font-medium text-blue-700 mb-2">Waktu Tiba</label>
+                                    <input type="time" id="schedule-arrival" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="schedule-driver" class="block text-sm font-medium text-blue-700 mb-2">Pengemudi</label>
+                                <input type="text" id="schedule-driver" class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="Nama pengemudi">
+                            </div>
+                            <button type="submit" class="w-full gradient-blue text-white py-4 px-6 rounded-lg font-semibold hover:shadow-lg transition duration-300 flex items-center justify-center shadow-md">
+                                <i class="fas fa-plus mr-3"></i>
+                                Tambah Jadwal
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Form: Update Jadwal -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-200 card-hover">
+                        <h3 class="text-xl font-semibold text-blue-800 mb-6 flex items-center">
+                            <i class="fas fa-edit mr-3 text-blue-600"></i>
+                            Update Jadwal
+                        </h3>
+                        <form id="update-schedule-form" class="space-y-6">
+                            <div>
+                                <label for="update-schedule-id" class="block text-sm font-medium text-blue-700 mb-2">Schedule ID</label>
+                                <input type="number" id="update-schedule-id" required class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input" placeholder="1" min="1">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="update-schedule-status" class="block text-sm font-medium text-blue-700 mb-2">Status</label>
+                                    <select id="update-schedule-status" class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input">
+                                        <option value="">Pilih Status</option>
+                                        <option value="On Time">On Time</option>
+                                        <option value="Delayed">Delayed</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="update-schedule-driver" class="block text-sm font-medium text-blue-700 mb-2">Pengemudi</label>
+                                    <input type="text" id="update-schedule-driver" class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 form-input">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 flex items-center justify-center shadow-md">
+                                <i class="fas fa-save mr-3"></i>
+                                Update Jadwal
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
         }
 
         /**
@@ -212,29 +818,57 @@
                 options.body = JSON.stringify(body);
             }
             
-            apiResponse.textContent = `Loading... [${method}] ${API_URL}${endpoint}`;
+            // Tampilkan loading spinner
+            const submitBtn = document.activeElement;
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<div class="spinner"></div>' + originalText;
+            submitBtn.disabled = true;
 
             try {
                 const response = await fetch(`${API_URL}${endpoint}`, options);
-                const data = await response.json();
                 
-                apiResponse.textContent = JSON.stringify(data, null, 2);
+                // Perbaikan: Cek content type sebelum parse JSON
+                const contentType = response.headers.get('content-type');
+                let data;
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    // Coba parse sebagai JSON, jika gagal gunakan teks biasa
+                    try {
+                        data = JSON.parse(text);
+                    } catch {
+                        data = { message: text, raw: text };
+                    }
+                }
+                
+                updateApiResponse(data);
 
                 if (response.ok) {
                     showMessage(data.message || 'Aksi berhasil!', false);
+                    // Refresh quick stats setelah aksi berhasil
+                    renderQuickStats();
                 } else {
                     showMessage(data.message || data.error || `Error ${response.status}`, true);
                 }
+                return data;
             } catch (error) {
                 console.error('Fetch error:', error);
                 const errorMsg = `Network error: ${error.message}`;
-                apiResponse.textContent = errorMsg;
+                updateApiResponse(errorMsg);
                 showMessage(errorMsg, true);
+                return null;
+            } finally {
+                // Kembalikan tombol ke state semula
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
             }
         }
 
         // --- Event Handlers untuk setiap form ---
 
+        // Bus Service Handlers
         async function handleAddBus(e) {
             e.preventDefault();
             const body = {
@@ -263,12 +897,11 @@
         async function handleUpdateStatus(e) {
             e.preventDefault();
             const busId = document.getElementById('status-bus-id').value;
-            // [MODIFIKASI] Ambil nilai string langsung dari select
-            const status = document.getElementById('status-operational').value; 
+            const status = document.getElementById('status-operational').value;
 
             const endpoint = `/bus/admin/buses/${busId}/status`;
             const body = {
-                operational_status: status // Kirim sebagai string
+                operational_status: status
             };
             await fetchAdminAPI(endpoint, 'PUT', body);
             e.target.reset();
@@ -279,8 +912,159 @@
             const busId = document.getElementById('unassign-bus-id').value;
             const endpoint = `/bus/admin/buses/${busId}/route/unassign`;
             
-            await fetchAdminAPI(endpoint, 'POST', null); // Tidak perlu body
+            await fetchAdminAPI(endpoint, 'POST', null);
             e.target.reset();
+        }
+
+        // Route Service Handlers
+        async function handleAddRoute(e) {
+            e.preventDefault();
+            const body = {
+                name: document.getElementById('route-name').value,
+                description: document.getElementById('route-description').value,
+                origin: document.getElementById('route-origin').value,
+                destination: document.getElementById('route-destination').value,
+                isActive: document.getElementById('route-is-active').value === 'true'
+            };
+            await fetchAdminAPI('/route/admin/routes/add', 'POST', body);
+            e.target.reset();
+        }
+
+        async function handleUpdateRoute(e) {
+            e.preventDefault();
+            const routeId = document.getElementById('update-route-id').value;
+            const body = {};
+            
+            const name = document.getElementById('update-route-name').value;
+            const status = document.getElementById('update-route-status').value;
+            
+            if (name) body.name = name;
+            if (status) body.isActive = status === 'true';
+            
+            if (Object.keys(body).length === 0) {
+                showMessage("Tidak ada data yang diubah", true);
+                return;
+            }
+            
+            const endpoint = `/route/admin/routes/${routeId}`;
+            await fetchAdminAPI(endpoint, 'PUT', body);
+            e.target.reset();
+        }
+
+        // Stop Service Handlers
+        async function handleAddStop(e) {
+            e.preventDefault();
+            const facilities = {};
+            document.querySelectorAll('input[name="facilities"]:checked').forEach(checkbox => {
+                facilities[checkbox.value] = true;
+            });
+            
+            const body = {
+                name: document.getElementById('stop-name').value,
+                address: document.getElementById('stop-address').value,
+                latitude: parseFloat(document.getElementById('stop-latitude').value),
+                longitude: parseFloat(document.getElementById('stop-longitude').value),
+                facilities: facilities
+            };
+            await fetchAdminAPI('/stop/admin/stops/add', 'POST', body);
+            e.target.reset();
+        }
+
+        async function handleUpdateStop(e) {
+            e.preventDefault();
+            const stopId = document.getElementById('update-stop-id').value;
+            const body = {};
+            
+            const name = document.getElementById('update-stop-name').value;
+            const address = document.getElementById('update-stop-address').value;
+            
+            if (name) body.name = name;
+            if (address) body.address = address;
+            
+            if (Object.keys(body).length === 0) {
+                showMessage("Tidak ada data yang diubah", true);
+                return;
+            }
+            
+            const endpoint = `/stop/admin/stops/${stopId}`;
+            await fetchAdminAPI(endpoint, 'PUT', body);
+            e.target.reset();
+        }
+
+        // Schedule Service Handlers
+        async function handleAddSchedule(e) {
+            e.preventDefault();
+            const body = {
+                route_id: parseInt(document.getElementById('schedule-route-id').value),
+                bus_id: parseInt(document.getElementById('schedule-bus-id').value),
+                bus_number: document.getElementById('schedule-bus-number').value,
+                departure_time: document.getElementById('schedule-departure').value,
+                arrival_time: document.getElementById('schedule-arrival').value,
+                status: document.getElementById('schedule-status').value,
+                driver: document.getElementById('schedule-driver').value || null
+            };
+            await fetchAdminAPI('/schedule/admin/schedules/add', 'POST', body);
+            e.target.reset();
+        }
+
+        async function handleUpdateSchedule(e) {
+            e.preventDefault();
+            const scheduleId = document.getElementById('update-schedule-id').value;
+            const body = {};
+            
+            const status = document.getElementById('update-schedule-status').value;
+            const driver = document.getElementById('update-schedule-driver').value;
+            
+            if (status) body.status = status;
+            if (driver) body.driver = driver;
+            
+            if (Object.keys(body).length === 0) {
+                showMessage("Tidak ada data yang diubah", true);
+                return;
+            }
+            
+            const endpoint = `/schedule/admin/schedules/${scheduleId}`;
+            await fetchAdminAPI(endpoint, 'PUT', body);
+            e.target.reset();
+        }
+
+        // --- Fungsi untuk Load Service Content ---
+        function loadBusContent() {
+            updateActiveNav('buses');
+            contentArea.innerHTML = renderBusContent();
+            
+            // Pasang event listeners
+            document.getElementById('add-bus-form').addEventListener('submit', handleAddBus);
+            document.getElementById('assign-route-form').addEventListener('submit', handleAssignRoute);
+            document.getElementById('update-status-form').addEventListener('submit', handleUpdateStatus);
+            document.getElementById('unassign-route-form').addEventListener('submit', handleUnassignRoute);
+        }
+
+        function loadRouteContent() {
+            updateActiveNav('routes');
+            contentArea.innerHTML = renderRouteContent();
+            
+            // Pasang event listeners
+            document.getElementById('add-route-form').addEventListener('submit', handleAddRoute);
+            document.getElementById('update-route-form').addEventListener('submit', handleUpdateRoute);
+        }
+
+        function loadStopContent() {
+            updateActiveNav('stops');
+            contentArea.innerHTML = renderStopContent();
+            
+            // Pasang event listeners
+            document.getElementById('add-stop-form').addEventListener('submit', handleAddStop);
+            document.getElementById('update-stop-form').addEventListener('submit', handleUpdateStop);
+        }
+
+        function loadScheduleContent() {
+            updateActiveNav('schedule');
+            contentArea.innerHTML = renderScheduleContent();
+            
+            // Pasang event listeners
+            document.getElementById('add-schedule-form').addEventListener('submit', handleAddSchedule);
+            document.getElementById('update-schedule-form').addEventListener('submit', handleUpdateSchedule);
         }
 
         /**
@@ -309,11 +1093,22 @@
                 window.location.href = '/index.html';
             });
 
-            // Pasang listener ke form
-            document.getElementById('add-bus-form').addEventListener('submit', handleAddBus);
-            document.getElementById('assign-route-form').addEventListener('submit', handleAssignRoute);
-            document.getElementById('update-status-form').addEventListener('submit', handleUpdateStatus);
-            document.getElementById('unassign-route-form').addEventListener('submit', handleUnassignRoute);
+            // Pasang listener untuk clear log
+            document.getElementById('clear-log').addEventListener('click', () => {
+                apiResponse.textContent = 'Log telah dibersihkan...';
+            });
+
+            // Pasang listener ke tab navigasi
+            document.getElementById('nav-buses').addEventListener('click', loadBusContent);
+            document.getElementById('nav-routes').addEventListener('click', loadRouteContent);
+            document.getElementById('nav-stops').addEventListener('click', loadStopContent);
+            document.getElementById('nav-schedule').addEventListener('click', loadScheduleContent);
+
+            // Load konten default (Bus)
+            loadBusContent();
+            
+            // Load quick stats
+            renderQuickStats();
         });
     </script>
 </body>

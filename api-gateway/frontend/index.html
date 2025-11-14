@@ -3,35 +3,389 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin Bus</title>
+    <title>Trans Pasundan - Dashboard</title>
     <!-- Muat Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Menggunakan font Inter yang modern */
         body {
             font-family: 'Inter', sans-serif;
         }
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        /* Animasi fade in */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* Gradient untuk hero section */
+        .hero-gradient {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+        
+        /* Card hover effect */
+        .card-hover {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1d4ed8;
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #3b82f6;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Floating elements animation */
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .element-1 {
+            width: 120px;
+            height: 120px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .element-2 {
+            width: 80px;
+            height: 80px;
+            top: 70%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .element-3 {
+            width: 100px;
+            height: 100px;
+            bottom: 20%;
+            left: 15%;
+            animation-delay: 4s;
+        }
+
+        .element-4 {
+            width: 60px;
+            height: 60px;
+            top: 30%;
+            right: 20%;
+            animation-delay: 1s;
+        }
+
+        .pulse-dots {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .dot-1 { top: 25%; left: 20%; animation-delay: 0s; }
+        .dot-2 { top: 60%; left: 80%; animation-delay: 0.5s; }
+        .dot-3 { top: 80%; left: 40%; animation-delay: 1s; }
+        .dot-4 { top: 40%; left: 70%; animation-delay: 1.5s; }
+        .dot-5 { top: 15%; left: 60%; animation-delay: 2s; }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg); 
+            }
+            50% { 
+                transform: translateY(-20px) rotate(180deg); 
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.8;
+                transform: scale(1.5);
+            }
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        .status-online {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-offline {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .status-in-service {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-available {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-maintenance {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-out-of-service {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .status-on-time {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-delayed {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-cancelled {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        /* Stop animation */
+        .stop-animation {
+            margin: 3rem auto;
+            width: 400px;
+            height: 200px;
+            position: relative;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .stop-shelter {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 80px;
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            animation: shelterPulse 3s ease-in-out infinite;
+        }
+
+        .bus-arrival {
+            position: absolute;
+            width: 40px;
+            height: 25px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 5px;
+            top: 50%;
+            right: -50px;
+            transform: translateY(-50%);
+            animation: busArrival 4s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .passenger {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            animation: passengerWait 2s ease-in-out infinite;
+        }
+
+        .passenger-1 { top: 40%; left: 30%; animation-delay: 0s; }
+        .passenger-2 { top: 60%; left: 40%; animation-delay: 0.5s; }
+        .passenger-3 { top: 50%; right: 30%; animation-delay: 1s; }
+
+        @keyframes shelterPulse {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+        }
+
+        @keyframes busArrival {
+            0%, 100% { 
+                right: -50px;
+                opacity: 0;
+            }
+            50% { 
+                right: 50%;
+                opacity: 1;
+            }
+            75% {
+                right: 30%;
+                opacity: 1;
+            }
+        }
+
+        @keyframes passengerWait {
+            0%, 100% { 
+                transform: translateY(0px);
+            }
+            50% { 
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-50 font-sans">
 
     <!-- Header (Navbar) -->
-    <header class="bg-white shadow-md sticky top-0 z-50">
+    <header class="bg-white shadow-sm sticky top-0 z-50 border-b border-blue-100">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
             
-            <!-- Navigasi Utama -->
+            <!-- Logo dan Navigasi Utama -->
             <div class="flex items-center space-x-8">
-                <h1 class="text-2xl font-bold text-gray-800">Sistem Rute Bus</h1>
-                <div class="flex space-x-4">
-                    <button id="nav-routes" class="py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600">
-                        Rute
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h1 class="text-xl font-bold text-blue-800">Trans Pasundan</h1>
+                </div>
+                <div class="hidden md:flex space-x-1">
+                    <button id="nav-routes" class="py-2 px-4 text-sm font-medium text-white bg-blue-600 rounded-lg transition-all duration-300 shadow-sm">
+                        <div class="flex items-center">
+                            <i class="fas fa-route mr-2"></i>
+                            Rute
+                        </div>
                     </button>
-                    <button id="nav-stops" class="py-2 text-sm font-medium text-gray-500 hover:text-gray-800 border-b-2 border-transparent hover:border-gray-300">
-                        Halte
+                    <button id="nav-stops" class="py-2 px-4 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-300">
+                        <div class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            Halte
+                        </div>
                     </button>
-                    <button id="nav-buses" class="py-2 text-sm font-medium text-gray-500 hover:text-gray-800 border-b-2 border-transparent hover:border-gray-300">
-                        Bus
+                    <button id="nav-buses" class="py-2 px-4 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-300">
+                        <div class="flex items-center">
+                            <i class="fas fa-bus mr-2"></i>
+                            Bus
+                        </div>
+                    </button>
+                    <button id="nav-schedule" class="py-2 px-4 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-300">
+                        <div class="flex items-center">
+                            <i class="fas fa-clock mr-2"></i>
+                            Jadwal
+                        </div>
                     </button>
                 </div>
             </div>
@@ -43,58 +397,217 @@
         </nav>
     </header>
 
-    <!-- Konten Utama -->
-    <main class="container mx-auto px-6 py-8">
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white py-16 relative overflow-hidden">
+        <!-- Animated Background Elements -->
+        <div class="floating-elements">
+            <div class="floating-element element-1"></div>
+            <div class="floating-element element-2"></div>
+            <div class="floating-element element-3"></div>
+            <div class="floating-element element-4"></div>
+            <div class="pulse-dots">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+                <div class="dot dot-3"></div>
+                <div class="dot dot-4"></div>
+                <div class="dot dot-5"></div>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <div class="inline-block bg-white/15 px-6 py-3 rounded-full backdrop-blur-sm border border-white/20 mb-8">
+                <i class="fas fa-satellite-dish mr-2"></i> Real-time Bus Tracking System
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Sistem Informasi Transportasi Bus Trans Pasundan</h1>
+            <p class="text-xl max-w-2xl mx-auto mb-8 opacity-90">
+                Informasi rute, halte, armada bus, dan jadwal perjalanan untuk perjalanan Anda yang lebih nyaman
+            </p>
+            <div class="flex justify-center">
+                <button id="get-started-btn" class="bg-white text-blue-600 font-semibold py-3 px-6 rounded-lg hover:bg-blue-50 transition duration-300 shadow-md">
+                    Mulai Jelajahi
+                </button>
+            </div>
+        </div>
+    </section>
 
-        <!-- Bagian Form Login/Register (Tersembunyi secara default) -->
-        <div id="forms-section" class="hidden bg-white p-8 rounded-lg shadow-md mb-8 max-w-4xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
-                <!-- Form Register -->
-                <div>
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Register</h2>
-                    <form id="register-form">
-                        <div class="mb-4">
-                            <label for="reg-username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                            <input type="text" id="reg-username" name="username" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="reg-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                            <input type="password" id="reg-password" name="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                        </div>
-                        <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">Register</button>
-                    </form>
-                    <p id="register-message" class="mt-4 text-sm"></p>
+    <!-- Statistik Section -->
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-blue-800 mb-10">Statistik Sistem</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="bg-white p-6 rounded-xl text-center card-hover border border-blue-100 shadow-sm">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-route text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-blue-800 mb-2" id="routes-count">0</h3>
+                    <p class="text-blue-600 font-medium">Rute Aktif</p>
                 </div>
-
-                <!-- Form Login -->
-                <div>
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Login</h2>
-                    <form id="login-form">
-                        <div class="mb-4">
-                            <label for="login-username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                            <input type="text" id="login-username" name="username" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="login-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                            <input type="password" id="login-password" name="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                        </div>
-                        <button type="submit" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-700 transition duration-300">Login</button>
-                    </form>
-                    <p id="login-message" class="mt-4 text-sm text-red-600"></p>
+                
+                <div class="bg-white p-6 rounded-xl text-center card-hover border border-blue-100 shadow-sm">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-map-marker-alt text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-blue-800 mb-2" id="stops-count">0</h3>
+                    <p class="text-blue-600 font-medium">Halte Tersedia</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl text-center card-hover border border-blue-100 shadow-sm">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-bus text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-blue-800 mb-2" id="buses-count">0</h3>
+                    <p class="text-blue-600 font-medium">Armada Bus</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl text-center card-hover border border-blue-100 shadow-sm">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-clock text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-blue-800 mb-2" id="schedules-count">0</h3>
+                    <p class="text-blue-600 font-medium">Jadwal Aktif</p>
                 </div>
             </div>
         </div>
+    </section>
+
+    <!-- Konten Utama -->
+    <main class="container mx-auto px-6 py-8">
 
         <!-- Area Konten Dinamis -->
-        <div id="content-area">
+        <div id="content-area" class="fade-in">
             <!-- Konten default (Rute) akan dimuat oleh JS -->
         </div>
 
     </main>
 
+    <!-- Footer -->
+    <footer class="bg-blue-800 text-white py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                            <i class="fas fa-bus text-blue-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Trans Pasundan</h3>
+                    </div>
+                    <p class="text-blue-200">Layanan transportasi bus terdepan untuk kenyamanan perjalanan Anda di wilayah Pasundan.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-white">Navigasi</h4>
+                    <ul class="space-y-2 text-blue-200">
+                        <li><a href="#" class="hover:text-white transition duration-300">Beranda</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-300">Tentang Kami</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-300">Layanan</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-300">Kontak</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-white">Layanan</h4>
+                    <ul class="space-y-2 text-blue-200">
+                        <li><a href="#" class="hover:text-white transition duration-300">Informasi Rute</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-300">Tracking Bus</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-300">Lokasi Halte</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-300">Jadwal Bus</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-white">Kontak</h4>
+                    <ul class="space-y-2 text-blue-200">
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2"></i>
+                            info@transpasundan.com
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-2"></i>
+                            (022) 1234-5678
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            Jl. Trans Pasundan No. 123, Bandung
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-blue-700 mt-8 pt-8 text-center text-blue-300">
+                <p>&copy; 2023 Trans Pasundan. Semua hak dilindungi.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal Login/Register -->
+    <div id="auth-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-blue-100 flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-blue-800">Masuk atau Daftar</h2>
+                <button id="close-auth-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    <!-- Form Register -->
+                    <div>
+                        <h3 class="text-2xl font-semibold text-blue-800 mb-4">Daftar Akun Baru</h3>
+                        <form id="register-form">
+                            <div class="mb-4">
+                                <label for="reg-username" class="block text-sm font-medium text-blue-700 mb-1">Username</label>
+                                <input type="text" id="reg-username" name="username" class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="reg-password" class="block text-sm font-medium text-blue-700 mb-1">Password</label>
+                                <input type="password" id="reg-password" name="password" class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300" required>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 flex items-center justify-center shadow-sm">
+                                <span>Daftar Sekarang</span>
+                                <i class="fas fa-user-plus ml-2"></i>
+                            </button>
+                        </form>
+                        <p id="register-message" class="mt-4 text-sm"></p>
+                    </div>
+
+                    <!-- Form Login -->
+                    <div>
+                        <h3 class="text-2xl font-semibold text-blue-800 mb-4">Masuk ke Akun Anda</h3>
+                        <form id="login-form">
+                            <div class="mb-4">
+                                <label for="login-username" class="block text-sm font-medium text-blue-700 mb-1">Username</label>
+                                <input type="text" id="login-username" name="username" class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="login-password" class="block text-sm font-medium text-blue-700 mb-1">Password</label>
+                                <input type="password" id="login-password" name="password" class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300" required>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 flex items-center justify-center shadow-sm">
+                                <span>Masuk</span>
+                                <i class="fas fa-sign-in-alt ml-2"></i>
+                            </button>
+                        </form>
+                        <p id="login-message" class="mt-4 text-sm text-red-600"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail -->
+    <div id="detail-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-blue-800" id="modal-title">Detail</h3>
+                <button id="close-detail-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="modal-body">
+                <!-- Konten detail akan diisi oleh JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <script>
-        // URL API Anda
+        // URL API Gateway
         const API_URL = 'http://localhost:5000/api';
         const contentArea = document.getElementById('content-area');
         const token = localStorage.getItem('token'); // Ambil token sekali
@@ -117,6 +630,19 @@
         }
 
         /**
+         * Fungsi untuk menampilkan error dengan format yang konsisten
+         */
+        function renderError(message, details = '') {
+            return `
+                <div class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
+                    <h3 class="text-lg font-medium text-red-800 mb-2">${message}</h3>
+                    <p class="text-red-600">${details}</p>
+                </div>
+            `;
+        }
+
+        /**
          * Memperbarui UI di pojok kanan atas berdasarkan status login.
          */
         function updateAuthUI() {
@@ -126,10 +652,15 @@
                 const username = payload.username || 'Pengguna'; 
 
                 authContainer.innerHTML = `
-                    <span class="text-gray-700">Selamat datang, <strong class="font-medium">${username}</strong>!</span>
-                    <button id="logout-btn" class="bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-red-600 transition duration-300">
-                        Logout
-                    </button>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <span class="text-blue-600 font-medium text-sm">${username.charAt(0).toUpperCase()}</span>
+                        </div>
+                        <span class="text-blue-700">Halo, <strong class="font-medium">${username}</strong>!</span>
+                        <button id="logout-btn" class="bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-red-600 transition duration-300 shadow-sm">
+                            Keluar
+                        </button>
+                    </div>
                 `;
                 document.getElementById('logout-btn').addEventListener('click', () => {
                     localStorage.removeItem('token');
@@ -137,12 +668,13 @@
                 });
             } else {
                 authContainer.innerHTML = `
-                    <button id="login-register-btn" class="bg-blue-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-blue-600 transition duration-300">
-                        Login / Register
+                    <button id="login-register-btn" class="bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-300 flex items-center shadow-sm">
+                        <i class="fas fa-user mr-2"></i>
+                        Masuk / Daftar
                     </button>
                 `;
                 document.getElementById('login-register-btn').addEventListener('click', () => {
-                    document.getElementById('forms-section').classList.toggle('hidden');
+                    document.getElementById('auth-modal').classList.remove('hidden');
                 });
             }
         }
@@ -150,21 +682,22 @@
         // --- Fungsi Navigasi ---
         
         function updateActiveNav(activeId) {
-            const navIds = ['routes', 'stops', 'buses'];
+            const navIds = ['routes', 'stops', 'buses', 'schedule'];
             navIds.forEach(id => {
                 const button = document.getElementById(`nav-${id}`);
-                button.classList.remove('text-blue-600', 'border-blue-600');
-                button.classList.add('text-gray-500', 'hover:text-gray-800', 'border-transparent', 'hover:border-gray-300');
+                button.classList.remove('text-white', 'bg-blue-600');
+                button.classList.add('text-blue-600', 'hover:text-blue-800', 'hover:bg-blue-50');
             });
             
             const activeButton = document.getElementById(`nav-${activeId}`);
-            activeButton.classList.add('text-blue-600', 'border-blue-600');
-            activeButton.classList.remove('text-gray-500', 'hover:text-gray-800', 'border-transparent', 'hover:border-gray-300');
+            activeButton.classList.add('text-white', 'bg-blue-600');
+            activeButton.classList.remove('text-blue-600', 'hover:text-blue-800', 'hover:bg-blue-50');
         }
 
-        // --- Fungsi untuk Render Tabel ---
-        
-        function renderRoutesTable(routes) {
+        // --- Fungsi untuk Render Konten Service ---
+
+        // Service: Routes
+        function renderRoutesContent(routes) {
             let tableRows = '';
             if (routes && routes.length > 0) {
                 routes.forEach(route => {
@@ -173,43 +706,48 @@
                         : `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Tidak Aktif</span>`;
 
                     tableRows += `
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${route.name}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${route.description}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${route.origin}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${route.destination}</td>
+                        <tr class="hover:bg-blue-50 transition duration-300">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900">${route.name}</td>
+                            <td class="px-6 py-4 whitespace-normal text-sm text-blue-700">${route.description}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-700">${route.origin}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-700">${route.destination}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
                         </tr>
                     `;
                 });
             } else {
-                tableRows = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Tidak ada data rute yang ditemukan.</td></tr>`;
+                tableRows = `<tr><td colspan="5" class="px-6 py-4 text-center text-blue-500">Tidak ada data rute yang ditemukan.</td></tr>`;
             }
 
-            contentArea.innerHTML = `
-                <h2 class="text-3xl font-semibold text-gray-800 mb-6">Daftar Rute Publik</h2>
-                <!-- [FIX] Ganti overflow-hidden -> overflow-x-auto -->
-                <div class="bg-white rounded-lg shadow-md overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-100">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Nama Rute</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Deskripsi</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Asal</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Tujuan</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">${tableRows}</tbody>
-                    </table>
+            return `
+                <div class="mb-6">
+                    <h2 class="text-3xl font-semibold text-blue-800">Informasi Rute Bus</h2>
+                    <p class="text-blue-600 mt-2">Lihat informasi lengkap tentang semua rute bus yang tersedia</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-blue-100">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-blue-200">
+                            <thead class="bg-blue-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Nama Rute</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Deskripsi</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Asal</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Tujuan</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-blue-100">${tableRows}</tbody>
+                        </table>
+                    </div>
                 </div>
             `;
         }
 
-        function renderStopsTable(stops) {
-            let tableRows = '';
+        // Service: Stops
+        function renderStopsContent(stops) {
+            let stopCards = '';
             if (stops && stops.length > 0) {
-                stops.forEach(stop => {
+                stops.forEach((stop, index) => {
                     const name = stop.name || 'N/A';
                     const address = stop.address || 'N/A'; 
                     
@@ -224,145 +762,675 @@
                     }
                     const facilitiesDisplay = facilitiesList.length > 0 ? facilitiesList.join(', ') : 'Tidak ada';
 
-                    tableRows += `
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${name}</td>
-                            <td class="px-6 py-4 whitespace-normal text-sm text-gray-600">${address}</td>
-                            <td class="px-6 py-4 whitespace-normal text-sm text-gray-600">${facilitiesDisplay}</td>
-                        </tr>
+                    stopCards += `
+                        <div class="bg-white p-6 rounded-xl shadow-md border border-blue-100 card-hover" onclick="showStopDetail(${index})">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 class="text-xl font-bold text-blue-800 flex items-center">
+                                        <i class="fas fa-bus-stop mr-2"></i>
+                                        ${name}
+                                    </h3>
+                                    <p class="text-blue-600 mt-1">${address}</p>
+                                </div>
+                                <div class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                                    <i class="fas fa-map-marker-alt mr-1"></i>
+                                    ${stop.coordinates ? `${stop.coordinates.latitude.toFixed(4)}, ${stop.coordinates.longitude.toFixed(4)}` : 'Koordinat tidak tersedia'}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h4 class="font-semibold text-blue-700 mb-2 flex items-center">
+                                    <i class="fas fa-list-check mr-2"></i>
+                                    Fasilitas
+                                </h4>
+                                <p class="text-blue-600">${facilitiesDisplay}</p>
+                            </div>
+                            
+                            <div class="text-blue-500 text-sm flex items-center">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Klik untuk melihat detail lengkap
+                            </div>
+                        </div>
                     `;
                 });
             } else {
-                tableRows = `<tr><td colspan="3" class="px-6 py-4 text-center text-gray-500">Tidak ada data halte yang ditemukan.</td></tr>`;
+                stopCards = `<div class="col-span-full text-center py-10 text-blue-500">Tidak ada data halte yang ditemukan.</div>`;
             }
 
-            contentArea.innerHTML = `
-                <h2 class="text-3xl font-semibold text-gray-800 mb-6">Daftar Halte Publik</h2>
-                <!-- [FIX] Ganti overflow-hidden -> overflow-x-auto -->
-                <div class="bg-white rounded-lg shadow-md overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-100">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Nama Halte</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Alamat</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Fasilitas</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">${tableRows}</tbody>
-                    </table>
+            return `
+                <div class="mb-6">
+                    <h2 class="text-3xl font-semibold text-blue-800">Informasi Halte Bus</h2>
+                    <p class="text-blue-600 mt-2">Informasi lengkap tentang semua halte bus yang tersedia</p>
+                </div>
+                
+                <!-- Stop Animation -->
+                <div class="stop-animation mb-8">
+                    <div class="stop-shelter">
+                        <i class="fas fa-bus"></i>
+                    </div>
+                    <div class="bus-arrival">
+                        <i class="fas fa-bus"></i>
+                    </div>
+                    <div class="passenger passenger-1"></div>
+                    <div class="passenger passenger-2"></div>
+                    <div class="passenger passenger-3"></div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${stopCards}
                 </div>
             `;
         }
 
-        function renderBusesTable(buses) {
-            let tableRows = '';
+        // Service: Buses
+        function renderBusesContent(buses) {
+            let busCards = '';
             if (buses && buses.length > 0) {
-                buses.forEach(bus => {
+                buses.forEach((bus, index) => {
                     const nomorPolisi = bus.nomor_polisi || 'N/A';
                     const kapasitas = bus.kapasitas_penumpang || 'N/A';
                     const model = bus.model_kendaraan || 'N/A';
                     
-                    // [MODIFIKASI] Logika baru untuk status operasional (string)
+                    // Status operasional
                     let statusBadge = '';
                     const statusText = bus.operational_status || 'N/A';
                     
                     switch(statusText) {
                         case 'Available':
-                            statusBadge = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Available</span>`;
+                            statusBadge = `<span class="status-badge status-available">Available</span>`;
                             break;
                         case 'In Service':
-                            statusBadge = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">In Service</span>`;
+                            statusBadge = `<span class="status-badge status-in-service">In Service</span>`;
                             break;
                         case 'Maintenance':
-                            statusBadge = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Maintenance</span>`;
+                            statusBadge = `<span class="status-badge status-maintenance">Maintenance</span>`;
                             break;
                         case 'Out of Service':
-                            statusBadge = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Out of Service</span>`;
+                            statusBadge = `<span class="status-badge status-out-of-service">Out of Service</span>`;
                             break;
                         default:
-                            statusBadge = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">${statusText}</span>`;
+                            statusBadge = `<span class="status-badge">${statusText}</span>`;
                     }
-                    // [MODIFIKASI] Akhir
+
+                    const gpsStatus = bus.status_gps === 'Online' 
+                        ? `<span class="status-badge status-online">GPS Online</span>`
+                        : `<span class="status-badge status-offline">GPS Offline</span>`;
 
                     const namaRute = (bus.route && bus.route.routeName) ? bus.route.routeName : 'N/A';
 
-                    tableRows += `
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${nomorPolisi}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${kapasitas}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${model}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${namaRute}</td>
-                        </tr>
+                    busCards += `
+                        <div class="bg-white p-6 rounded-xl shadow-md border border-blue-100 card-hover" onclick="showBusDetail(${index})">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 class="text-xl font-bold text-blue-800 flex items-center">
+                                        <i class="fas fa-bus mr-2"></i>
+                                        ${nomorPolisi}
+                                    </h3>
+                                    <p class="text-blue-600 mt-1">${model} • ${kapasitas} penumpang</p>
+                                </div>
+                                <div class="flex flex-col items-end space-y-2">
+                                    ${statusBadge}
+                                    ${gpsStatus}
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div class="bg-blue-50 p-3 rounded-lg">
+                                    <p class="text-sm text-blue-600">Kecepatan</p>
+                                    <p class="font-bold text-blue-800">${bus.speed?.current || 0} km/h</p>
+                                </div>
+                                <div class="bg-blue-50 p-3 rounded-lg">
+                                    <p class="text-sm text-blue-600">Rata-rata</p>
+                                    <p class="font-bold text-blue-800">${bus.speed?.average || 0} km/h</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h4 class="font-semibold text-blue-700 mb-2 flex items-center">
+                                    <i class="fas fa-route mr-2"></i>
+                                    Rute
+                                </h4>
+                                <p class="text-blue-600">${namaRute}</p>
+                            </div>
+                            
+                            <div class="text-blue-500 text-sm flex items-center">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Klik untuk melihat detail lengkap
+                            </div>
+                        </div>
                     `;
                 });
             } else {
-                tableRows = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Tidak ada data bus yang ditemukan.</td></tr>`;
+                busCards = `<div class="col-span-full text-center py-10 text-blue-500">Tidak ada data bus yang ditemukan.</div>`;
             }
 
-            contentArea.innerHTML = `
-                <h2 class="text-3xl font-semibold text-gray-800 mb-6">Daftar Bus Publik</h2>
-                <!-- [FIX] Ganti overflow-hidden -> overflow-x-auto -->
-                <div class="bg-white rounded-lg shadow-md overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-100">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Nomor Polisi</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Kapasitas</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Model Kendaraan</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status Operasional</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Nama Rute</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">${tableRows}</tbody>
-                    </table>
+            return `
+                <div class="mb-6">
+                    <h2 class="text-3xl font-semibold text-blue-800">Informasi Armada Bus</h2>
+                    <p class="text-blue-600 mt-2">Pantau status dan informasi real-time armada bus</p>
+                </div>
+                
+                <!-- Filter Section -->
+                <div class="bg-white p-6 rounded-xl shadow-md mb-6 border border-blue-100">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-4 flex items-center">
+                        <i class="fas fa-filter mr-2"></i>
+                        Filter Status Bus
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="filter-btn active bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-300" onclick="filterBuses('all')">
+                            Semua Bus
+                        </button>
+                        <button class="filter-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-200 transition duration-300" onclick="filterBuses('In Service')">
+                            In Service
+                        </button>
+                        <button class="filter-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-200 transition duration-300" onclick="filterBuses('Available')">
+                            Available
+                        </button>
+                        <button class="filter-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-200 transition duration-300" onclick="filterBuses('Maintenance')">
+                            Maintenance
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="bus-cards-container">
+                    ${busCards}
                 </div>
             `;
         }
 
+        // Service: Schedule
+        function renderScheduleContent(schedules) {
+            let scheduleCards = '';
+            if (schedules && schedules.length > 0) {
+                schedules.forEach((schedule, index) => {
+                    const routeName = schedule.routeName || 'N/A';
+                    const busNumber = schedule.busNumber || 'N/A';
+                    const departureTime = schedule.departureTime || 'N/A';
+                    const arrivalTime = schedule.arrivalTime || 'N/A';
+                    const status = schedule.status || 'N/A';
+
+                    let statusBadge = '';
+                    switch(status) {
+                        case 'On Time':
+                            statusBadge = `<span class="status-badge status-on-time">Tepat Waktu</span>`;
+                            break;
+                        case 'Delayed':
+                            statusBadge = `<span class="status-badge status-delayed">Terlambat</span>`;
+                            break;
+                        case 'Cancelled':
+                            statusBadge = `<span class="status-badge status-cancelled">Dibatalkan</span>`;
+                            break;
+                        default:
+                            statusBadge = `<span class="status-badge">${status}</span>`;
+                    }
+
+                    scheduleCards += `
+                        <div class="bg-white p-6 rounded-xl shadow-md border border-blue-100 card-hover" onclick="showScheduleDetail(${index})">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 class="text-xl font-bold text-blue-800 flex items-center">
+                                        <i class="fas fa-route mr-2"></i>
+                                        ${routeName}
+                                    </h3>
+                                    <p class="text-blue-600 mt-1">Bus: ${busNumber}</p>
+                                </div>
+                                <div class="flex flex-col items-end space-y-2">
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div class="bg-blue-50 p-3 rounded-lg">
+                                    <p class="text-sm text-blue-600">Berangkat</p>
+                                    <p class="font-bold text-blue-800">${departureTime}</p>
+                                </div>
+                                <div class="bg-blue-50 p-3 rounded-lg">
+                                    <p class="text-sm text-blue-600">Tiba</p>
+                                    <p class="font-bold text-blue-800">${arrivalTime}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h4 class="font-semibold text-blue-700 mb-2 flex items-center">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    Informasi
+                                </h4>
+                                <p class="text-blue-600">${schedule.additionalInfo || 'Tidak ada informasi tambahan'}</p>
+                            </div>
+                            
+                            <div class="text-blue-500 text-sm flex items-center">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Klik untuk melihat detail lengkap
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                scheduleCards = `<div class="col-span-full text-center py-10 text-blue-500">Tidak ada data jadwal yang ditemukan.</div>`;
+            }
+
+            return `
+                <div class="mb-6">
+                    <h2 class="text-3xl font-semibold text-blue-800">Informasi Jadwal Bus</h2>
+                    <p class="text-blue-600 mt-2">Lihat jadwal keberangkatan bus untuk perencanaan perjalanan Anda</p>
+                </div>
+                
+                <!-- Schedule Animation -->
+                <div class="flex justify-center mb-8">
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-blue-100 text-center max-w-md">
+                        <i class="fas fa-clock text-blue-600 text-4xl mb-4"></i>
+                        <h3 class="text-xl font-bold text-blue-800 mb-2">Jadwal Real-time</h3>
+                        <p class="text-blue-600">Pantau jadwal bus secara real-time untuk perencanaan perjalanan yang lebih baik</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                    ${scheduleCards}
+                </div>
+            `;
+        }
 
         // --- Fungsi untuk Fetch Data ---
 
         async function fetchRoutes() {
             updateActiveNav('routes');
-            contentArea.innerHTML = `<p class="text-center text-gray-500 py-10">Memuat data rute...</p>`;
+            contentArea.innerHTML = `
+                <div class="flex justify-center items-center py-20">
+                    <div class="spinner"></div>
+                    <span class="ml-3 text-blue-600 font-medium">Memuat data rute...</span>
+                </div>
+            `;
             try {
                 const response = await fetch(`${API_URL}/route/routes`);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
-                renderRoutesTable(data.routes); 
+                contentArea.innerHTML = renderRoutesContent(data.routes);
+                
+                // Update statistik
+                document.getElementById('routes-count').textContent = data.routes ? data.routes.length : 0;
             } catch (error) {
                 console.error('Error fetching routes:', error);
-                contentArea.innerHTML = `<p class="text-center text-red-500 py-10">Gagal memuat data rute.</p>`;
+                contentArea.innerHTML = renderError('Gagal memuat data rute', 'Terjadi kesalahan saat mengambil data dari server.');
             }
         }
         
         async function fetchStops() {
             updateActiveNav('stops');
-            contentArea.innerHTML = `<p class="text-center text-gray-500 py-10">Memuat data halte...</p>`;
+            contentArea.innerHTML = `
+                <div class="flex justify-center items-center py-20">
+                    <div class="spinner"></div>
+                    <span class="ml-3 text-blue-600 font-medium">Memuat data halte...</span>
+                </div>
+            `;
             try {
                 const response = await fetch(`${API_URL}/stop/stops`);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
-                renderStopsTable(data.stops); 
+                window.allStops = data.stops; // Simpan untuk akses di fungsi detail
+                contentArea.innerHTML = renderStopsContent(data.stops);
+                
+                // Update statistik
+                document.getElementById('stops-count').textContent = data.stops ? data.stops.length : 0;
             } catch (error) {
                 console.error('Error fetching stops:', error);
-                contentArea.innerHTML = `<p class="text-center text-red-500 py-10">Gagal memuat data halte.</p>`;
+                contentArea.innerHTML = renderError('Gagal memuat data halte', 'Terjadi kesalahan saat mengambil data dari server.');
             }
         }
         
         async function fetchBuses() {
             updateActiveNav('buses');
-            contentArea.innerHTML = `<p class="text-center text-gray-500 py-10">Memuat data bus...</p>`;
+            contentArea.innerHTML = `
+                <div class="flex justify-center items-center py-20">
+                    <div class="spinner"></div>
+                    <span class="ml-3 text-blue-600 font-medium">Memuat data bus...</span>
+                </div>
+            `;
             try {
                 const response = await fetch(`${API_URL}/bus/buses`);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
-                renderBusesTable(data.buses); 
+                window.allBuses = data.buses; // Simpan untuk akses di fungsi detail dan filter
+                contentArea.innerHTML = renderBusesContent(data.buses);
+                
+                // Update statistik
+                document.getElementById('buses-count').textContent = data.buses ? data.buses.length : 0;
             } catch (error) {
                 console.error('Error fetching buses:', error);
-                contentArea.innerHTML = `<p class="text-center text-red-500 py-10">Gagal memuat data bus.</p>`;
+                contentArea.innerHTML = renderError('Gagal memuat data bus', 'Terjadi kesalahan saat mengambil data dari server.');
             }
+        }
+
+        async function fetchSchedule() {
+            updateActiveNav('schedule');
+            contentArea.innerHTML = `
+                <div class="flex justify-center items-center py-20">
+                    <div class="spinner"></div>
+                    <span class="ml-3 text-blue-600 font-medium">Memuat data jadwal...</span>
+                </div>
+            `;
+            
+            try {
+                // Step 1: Ambil semua rute terlebih dahulu
+                const routesResponse = await fetch(`${API_URL}/route/routes`);
+                if (!routesResponse.ok) throw new Error(`HTTP error! status: ${routesResponse.status}`);
+                const routesData = await routesResponse.json();
+                
+                if (!routesData.routes || routesData.routes.length === 0) {
+                    contentArea.innerHTML = renderScheduleContent([]);
+                    document.getElementById('schedules-count').textContent = '0';
+                    return;
+                }
+
+                // Step 2: Ambil jadwal untuk setiap rute
+                const allSchedules = [];
+                const routePromises = routesData.routes.map(async (route) => {
+                    try {
+                        const scheduleResponse = await fetch(`${API_URL}/schedule/schedules/${route.id}`);
+                        if (scheduleResponse.ok) {
+                            const scheduleData = await scheduleResponse.json();
+                            if (scheduleData.schedules && scheduleData.schedules.length > 0) {
+                                // Tambahkan informasi rute ke setiap jadwal
+                                scheduleData.schedules.forEach(schedule => {
+                                    schedule.routeName = route.name;
+                                    schedule.routeId = route.id;
+                                });
+                                allSchedules.push(...scheduleData.schedules);
+                            }
+                        }
+                    } catch (error) {
+                        console.error(`Error fetching schedule for route ${route.id}:`, error);
+                    }
+                });
+
+                // Tunggu semua request selesai
+                await Promise.all(routePromises);
+
+                // Simpan data untuk akses di fungsi detail
+                window.allSchedules = allSchedules;
+                
+                // Render konten jadwal
+                contentArea.innerHTML = renderScheduleContent(allSchedules);
+                
+                // Update statistik
+                document.getElementById('schedules-count').textContent = allSchedules.length;
+
+            } catch (error) {
+                console.error('Error fetching schedules:', error);
+                contentArea.innerHTML = renderError(
+                    'Gagal memuat data jadwal', 
+                    'Pastikan Schedule Service berjalan dan terhubung dengan API Gateway.'
+                );
+            }
+        }
+
+        // --- Fungsi untuk Detail Modal ---
+
+        function showBusDetail(index) {
+            const bus = window.allBuses[index];
+            if (!bus) return;
+            
+            document.getElementById('modal-title').textContent = `Detail Bus: ${bus.nomor_polisi}`;
+            
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-blue-50 p-3 rounded-lg">
+                            <p class="text-sm text-blue-600">Model Kendaraan</p>
+                            <p class="font-bold text-blue-800">${bus.model_kendaraan || 'N/A'}</p>
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-lg">
+                            <p class="text-sm text-blue-600">Kapasitas</p>
+                            <p class="font-bold text-blue-800">${bus.kapasitas_penumpang || 'N/A'} penumpang</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-blue-50 p-3 rounded-lg">
+                            <p class="text-sm text-blue-600">Kecepatan Saat Ini</p>
+                            <p class="font-bold text-blue-800">${bus.speed?.current || 0} km/h</p>
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-lg">
+                            <p class="text-sm text-blue-600">Rata-rata Kecepatan</p>
+                            <p class="font-bold text-blue-800">${bus.speed?.average || 0} km/h</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 p-3 rounded-lg">
+                        <p class="text-sm text-blue-600">Status GPS</p>
+                        <p class="font-bold text-blue-800">${bus.status_gps || 'N/A'}</p>
+                    </div>
+                    
+                    <div class="bg-blue-50 p-3 rounded-lg">
+                        <p class="text-sm text-blue-600">Status Operasional</p>
+                        <p class="font-bold text-blue-800">${bus.operational_status || 'N/A'}</p>
+                    </div>
+                    
+                    ${bus.route ? `
+                    <div class="bg-blue-50 p-3 rounded-lg">
+                        <p class="text-sm text-blue-600">Rute</p>
+                        <p class="font-bold text-blue-800">${bus.route.routeName || 'N/A'}</p>
+                        ${bus.route.currentStop ? `<p class="text-sm text-blue-600 mt-1">Halte Saat Ini: ${bus.route.currentStop}</p>` : ''}
+                        ${bus.route.nextStop ? `<p class="text-sm text-blue-600">Halte Berikutnya: ${bus.route.nextStop}</p>` : ''}
+                    </div>
+                    ` : ''}
+                    
+                    ${bus.lokasi_geografis ? `
+                    <div class="bg-blue-50 p-3 rounded-lg">
+                        <p class="text-sm text-blue-600">Lokasi Terakhir</p>
+                        <p class="font-bold text-blue-800">${bus.lokasi_geografis.latitude.toFixed(4)}, ${bus.lokasi_geografis.longitude.toFixed(4)}</p>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        function showStopDetail(index) {
+            const stop = window.allStops[index];
+            if (!stop) return;
+            
+            document.getElementById('modal-title').textContent = `Detail Halte: ${stop.name}`;
+            
+            const modalBody = document.getElementById('modal-body');
+            
+            let facilitiesHtml = '';
+            if (stop.facilities) {
+                facilitiesHtml = Object.entries(stop.facilities)
+                    .map(([key, value]) => {
+                        const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        return `
+                            <div class="flex justify-between items-center py-2 border-b border-blue-100">
+                                <span class="text-blue-700">${formattedKey}</span>
+                                <span class="${value ? 'text-green-600' : 'text-red-600'} font-semibold">
+                                    ${value ? 'Tersedia' : 'Tidak Tersedia'}
+                                </span>
+                            </div>
+                        `;
+                    })
+                    .join('');
+            }
+            
+            modalBody.innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-blue-50 p-3 rounded-lg">
+                        <p class="text-sm text-blue-600">Alamat</p>
+                        <p class="font-bold text-blue-800">${stop.address || 'N/A'}</p>
+                    </div>
+                    
+                    ${stop.coordinates ? `
+                    <div class="bg-blue-50 p-3 rounded-lg">
+                        <p class="text-sm text-blue-600">Koordinat</p>
+                        <p class="font-bold text-blue-800">${stop.coordinates.latitude.toFixed(4)}, ${stop.coordinates.longitude.toFixed(4)}</p>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="bg-blue-50 p-3 rounded-lg">
+                        <p class="text-sm text-blue-600 mb-2">Fasilitas</p>
+                        <div class="space-y-1">
+                            ${facilitiesHtml || '<p class="text-blue-700">Tidak ada informasi fasilitas</p>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        function showScheduleDetail(index) {
+            const schedule = window.allSchedules[index];
+            if (!schedule) return;
+            
+            document.getElementById('modal-title').textContent = `Detail Jadwal: ${schedule.routeName}`;
+            
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-blue-50 p-3 rounded-lg">
+                            <p class="text-sm text-blue-600">Rute</p>
+                            <p class="font-bold text-blue-800">${schedule.routeName || 'N/A'}</p>
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-lg">
+                            <p class="text-sm text-blue-600">Nomor Bus</p>
+                            <p class="font-bold text-blue-800">${schedule.busNumber || 'N/A'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-blue-50 p-3 rounded-lg">
+                            <p class="text-sm text-blue-600">Waktu Berangkat</p>
+                            <p class="font-bold text-blue-800">${schedule.departureTime || 'N/A'}</p>
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-lg">
+                            <p class="text-sm text-blue-600">Waktu Tiba</p>
+                            <p class="font-bold text-blue-800">${schedule.arrivalTime || 'N/A'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 p-3 rounded-lg">
+                        <p class="text-sm text-blue-600">Status</p>
+                        <p class="font-bold text-blue-800">${schedule.status || 'N/A'}</p>
+                    </div>
+                    
+                    ${schedule.additionalInfo ? `
+                    <div class="bg-blue-50 p-3 rounded-lg">
+                        <p class="text-sm text-blue-600">Informasi Tambahan</p>
+                        <p class="font-bold text-blue-800">${schedule.additionalInfo}</p>
+                    </div>
+                    ` : ''}
+                    
+                    ${schedule.driver ? `
+                    <div class="bg-blue-50 p-3 rounded-lg">
+                        <p class="text-sm text-blue-600">Pengemudi</p>
+                        <p class="font-bold text-blue-800">${schedule.driver}</p>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        // --- Fungsi Filter Bus ---
+
+        function filterBuses(status) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-600', 'text-white');
+                btn.classList.add('bg-blue-100', 'text-blue-700');
+            });
+            event.target.classList.add('active', 'bg-blue-600', 'text-white');
+            event.target.classList.remove('bg-blue-100', 'text-blue-700');
+            
+            // Filter buses
+            let filteredBuses = window.allBuses;
+            if (status !== 'all') {
+                filteredBuses = window.allBuses.filter(bus => bus.operational_status === status);
+            }
+            
+            // Update display
+            const busCardsContainer = document.getElementById('bus-cards-container');
+            if (busCardsContainer) {
+                busCardsContainer.innerHTML = renderBusCards(filteredBuses);
+            }
+        }
+
+        function renderBusCards(buses) {
+            return buses.map((bus, index) => {
+                const nomorPolisi = bus.nomor_polisi || 'N/A';
+                const kapasitas = bus.kapasitas_penumpang || 'N/A';
+                const model = bus.model_kendaraan || 'N/A';
+                
+                let statusBadge = '';
+                const statusText = bus.operational_status || 'N/A';
+                
+                switch(statusText) {
+                    case 'Available':
+                        statusBadge = `<span class="status-badge status-available">Available</span>`;
+                        break;
+                    case 'In Service':
+                        statusBadge = `<span class="status-badge status-in-service">In Service</span>`;
+                        break;
+                    case 'Maintenance':
+                        statusBadge = `<span class="status-badge status-maintenance">Maintenance</span>`;
+                        break;
+                    case 'Out of Service':
+                        statusBadge = `<span class="status-badge status-out-of-service">Out of Service</span>`;
+                        break;
+                    default:
+                        statusBadge = `<span class="status-badge">${statusText}</span>`;
+                }
+
+                const gpsStatus = bus.status_gps === 'Online' 
+                    ? `<span class="status-badge status-online">GPS Online</span>`
+                    : `<span class="status-badge status-offline">GPS Offline</span>`;
+
+                const namaRute = (bus.route && bus.route.routeName) ? bus.route.routeName : 'N/A';
+
+                return `
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-blue-100 card-hover" onclick="showBusDetail(${window.allBuses.indexOf(bus)})">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-blue-800 flex items-center">
+                                    <i class="fas fa-bus mr-2"></i>
+                                    ${nomorPolisi}
+                                </h3>
+                                <p class="text-blue-600 mt-1">${model} • ${kapasitas} penumpang</p>
+                            </div>
+                            <div class="flex flex-col items-end space-y-2">
+                                ${statusBadge}
+                                ${gpsStatus}
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="bg-blue-50 p-3 rounded-lg">
+                                <p class="text-sm text-blue-600">Kecepatan</p>
+                                <p class="font-bold text-blue-800">${bus.speed?.current || 0} km/h</p>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded-lg">
+                                <p class="text-sm text-blue-600">Rata-rata</p>
+                                <p class="font-bold text-blue-800">${bus.speed?.average || 0} km/h</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h4 class="font-semibold text-blue-700 mb-2 flex items-center">
+                                <i class="fas fa-route mr-2"></i>
+                                Rute
+                            </h4>
+                            <p class="text-blue-600">${namaRute}</p>
+                        </div>
+                        
+                        <div class="text-blue-500 text-sm flex items-center">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Klik untuk melihat detail lengkap
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
         
         // --- Fungsi Form Login/Register ---
@@ -411,7 +1479,6 @@
                 });
                 const result = await response.json();
                 
-                // [MODIFIKASI] Logika baru setelah login sukses
                 if (response.ok && result.token) {
                     // 1. Simpan token
                     localStorage.setItem('token', result.token);
@@ -422,11 +1489,9 @@
                     // 3. Cek role dan redirect
                     if (payload && payload.role === 'admin') {
                         // Jika admin, redirect ke admin.html
-                        // Browser akan memuat halaman admin.html
                         window.location.href = '/admin.html';
                     } else {
                         // Jika user biasa, reload halaman index
-                        // Ini akan menjalankan updateAuthUI() dan menampilkan tabel
                         location.reload();
                     }
                 } else {
@@ -456,6 +1521,34 @@
             document.getElementById('nav-routes').addEventListener('click', fetchRoutes);
             document.getElementById('nav-stops').addEventListener('click', fetchStops);
             document.getElementById('nav-buses').addEventListener('click', fetchBuses);
+            document.getElementById('nav-schedule').addEventListener('click', fetchSchedule);
+            
+            // 5. Event listener untuk tombol "Mulai Jelajahi"
+            document.getElementById('get-started-btn').addEventListener('click', () => {
+                document.getElementById('auth-modal').classList.remove('hidden');
+            });
+            
+            // 6. Event listener untuk menutup modal
+            document.getElementById('close-auth-modal').addEventListener('click', () => {
+                document.getElementById('auth-modal').classList.add('hidden');
+            });
+            
+            document.getElementById('close-detail-modal').addEventListener('click', () => {
+                document.getElementById('detail-modal').classList.add('hidden');
+            });
+            
+            // 7. Event listener untuk menutup modal saat klik di luar
+            document.getElementById('auth-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'auth-modal') {
+                    document.getElementById('auth-modal').classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('detail-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'detail-modal') {
+                    document.getElementById('detail-modal').classList.add('hidden');
+                }
+            });
         });
 
     </script>

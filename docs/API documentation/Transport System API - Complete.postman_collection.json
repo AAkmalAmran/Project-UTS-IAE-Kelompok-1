@@ -1,0 +1,3002 @@
+{
+	"info": {
+		"_postman_id": "10a70310-9462-4ed5-85aa-5b7354c7e07a",
+		"name": "Transport System API - Complete",
+		"description": "Complete API collection for Transport System Microservices",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44828361",
+		"_collection_link": "https://ahmadakmalamran.postman.co/workspace/Ahmad-Akmal-Amran's-Workspace~41c5704f-ecbf-43b6-857d-21d46189826b/collection/44828361-10a70310-9462-4ed5-85aa-5b7354c7e07a?action=share&source=collection_link&creator=44828361"
+	},
+	"item": [
+		{
+			"name": "1. User Service (5001)",
+			"item": [
+				{
+					"name": "Register Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\",\n  \"role\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5001/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Register Admin",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"admin2\",\n  \"password\": \"admin123\",\n  \"role\": \"admin\"\n}"
+								},
+								"url": {
+									"raw": "http://0.0.0.0:5000/api/user/register",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"user",
+										"register"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "gunicorn"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 12 Nov 2025 14:58:16 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "129"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"User admin2 berhasil didaftarkan.\",\n    \"user\": {\n        \"id\": 3,\n        \"role\": \"admin\",\n        \"username\": \"admin2\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"user1\",\n  \"password\": \"password123\",\n  \"role\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5001/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Register User",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"user0\",\n  \"password\": \"password123\",\n  \"role\": \"user\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/user/register",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"user",
+										"register"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "gunicorn"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 12 Nov 2025 14:58:32 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "126"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"User user0 berhasil didaftarkan.\",\n    \"user\": {\n        \"id\": 4,\n        \"role\": \"user\",\n        \"username\": \"user0\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5001/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/user/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"user",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "gunicorn"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 12 Nov 2025 14:59:10 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "449"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTc2Mjk2MTM1MCwiaWF0IjoxNzYyOTU5NTUwfQ.NNqPdjLsE2J681P55aXPZjGxIIcQH_mw9KyBQ5wi8A0\",\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTc2Mjk2MTM1MCwiaWF0IjoxNzYyOTU5NTUwfQ.NNqPdjLsE2J681P55aXPZjGxIIcQH_mw9KyBQ5wi8A0\",\n    \"user\": {\n        \"id\": 1,\n        \"role\": \"admin\",\n        \"username\": \"admin\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get All Users",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5001/users",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5001",
+									"path": [
+										"users"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.12"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 09 Nov 2025 11:58:14 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "173"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"users\": [\n        {\n            \"id\": 1,\n            \"role\": \"admin\",\n            \"username\": \"admin\"\n        },\n        {\n            \"id\": 2,\n            \"role\": \"user\",\n            \"username\": \"user1\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/users/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"users",
+								"2"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Delete User",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5000/api/user/users/2",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"user",
+										"users",
+										"2"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "gunicorn"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 12 Nov 2025 15:02:53 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "51"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"User user2 deleted successfully\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "2. Route Service (5002)",
+			"item": [
+				{
+					"name": "Public",
+					"item": [
+						{
+							"name": "Public - Get All Routes",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5002/routes",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5002",
+									"path": [
+										"routes"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Public - Get All Routes",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://0.0.0.0:5000/api/route/routes",
+											"protocol": "http",
+											"host": [
+												"0",
+												"0",
+												"0",
+												"0"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"route",
+												"routes"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:12:53 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "788"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"routes\": [\n        {\n            \"description\": \"Rute dari Masjid Jami Baitul Huda Baleendah ke Matahari Land\",\n            \"destination\": \"Matahari Land\",\n            \"isActive\": true,\n            \"name\": \"Rute A\",\n            \"origin\": \"Masjid Jami Baitul Huda Baleendah\",\n            \"routeId\": 1\n        },\n        {\n            \"description\": \"Rute dari Bandung Electronic Centre (BEC) ke Baleendah\",\n            \"destination\": \"Baleendah\",\n            \"isActive\": true,\n            \"name\": \"Rute B\",\n            \"origin\": \"Bandung Electronic Centre (BEC)\",\n            \"routeId\": 2\n        },\n        {\n            \"description\": \"Koridor utama menghubungkan Stasiun Bandung dengan BEC\",\n            \"destination\": \"Bandung Electronic Centre (BEC)\",\n            \"isActive\": true,\n            \"name\": \"Koridor 1\",\n            \"origin\": \"Stasiun Bandung\",\n            \"routeId\": 3\n        }\n    ],\n    \"total\": 3\n}"
+								}
+							]
+						},
+						{
+							"name": "Public - Get Route Detail",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5002/routes/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5002",
+									"path": [
+										"routes",
+										"1"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Public - Get Route Detail",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:5000/api/route/routes/1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"route",
+												"routes",
+												"1"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:13:17 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1333"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"description\": \"Rute dari Masjid Jami Baitul Huda Baleendah ke Matahari Land\",\n    \"destination\": \"Matahari Land\",\n    \"isActive\": true,\n    \"name\": \"Rute A\",\n    \"origin\": \"Masjid Jami Baitul Huda Baleendah\",\n    \"routeId\": 1,\n    \"stops\": [\n        {\n            \"distanceToNext\": 1,\n            \"routeStopId\": 1,\n            \"sequenceOrder\": 1,\n            \"stopId\": 2,\n            \"stopName\": \"Masjid Jami Baitul Huda Baleendah\",\n            \"timeToNext\": 3\n        },\n        {\n            \"distanceToNext\": 1,\n            \"routeStopId\": 2,\n            \"sequenceOrder\": 2,\n            \"stopId\": 3,\n            \"stopName\": \"Griya Bandung Asri (GBA)\",\n            \"timeToNext\": 3\n        },\n        {\n            \"distanceToNext\": 1,\n            \"routeStopId\": 3,\n            \"sequenceOrder\": 3,\n            \"stopId\": 4,\n            \"stopName\": \"Sekolah Moh Toha\",\n            \"timeToNext\": 3\n        },\n        {\n            \"distanceToNext\": 1,\n            \"routeStopId\": 4,\n            \"sequenceOrder\": 4,\n            \"stopId\": 5,\n            \"stopName\": \"Museum Kota Bandung\",\n            \"timeToNext\": 3\n        },\n        {\n            \"distanceToNext\": 1,\n            \"routeStopId\": 5,\n            \"sequenceOrder\": 5,\n            \"stopId\": 6,\n            \"stopName\": \"Merdeka\",\n            \"timeToNext\": 3\n        },\n        {\n            \"distanceToNext\": null,\n            \"routeStopId\": 6,\n            \"sequenceOrder\": 6,\n            \"stopId\": 7,\n            \"stopName\": \"Alun-alun Bandung\",\n            \"timeToNext\": null\n        }\n    ],\n    \"totalDistance\": 5,\n    \"totalStops\": 6\n}"
+								}
+							]
+						},
+						{
+							"name": "Public - Get Route Stops",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5002/routes/1/stops",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5002",
+									"path": [
+										"routes",
+										"1",
+										"stops"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Public - Get Route Stops",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:5000/api/route/routes/1/stops",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"route",
+												"routes",
+												"1",
+												"stops"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:13:34 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1237"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"destination\": \"Matahari Land\",\n    \"origin\": \"Masjid Jami Baitul Huda Baleendah\",\n    \"routeId\": 1,\n    \"routeName\": \"Rute A\",\n    \"stops\": [\n        {\n            \"distanceToNext\": 1,\n            \"routeStopId\": 1,\n            \"sequenceOrder\": 1,\n            \"stopId\": 2,\n            \"stopName\": \"Masjid Jami Baitul Huda Baleendah\",\n            \"timeToNext\": 3\n        },\n        {\n            \"distanceToNext\": 1,\n            \"routeStopId\": 2,\n            \"sequenceOrder\": 2,\n            \"stopId\": 3,\n            \"stopName\": \"Griya Bandung Asri (GBA)\",\n            \"timeToNext\": 3\n        },\n        {\n            \"distanceToNext\": 1,\n            \"routeStopId\": 3,\n            \"sequenceOrder\": 3,\n            \"stopId\": 4,\n            \"stopName\": \"Sekolah Moh Toha\",\n            \"timeToNext\": 3\n        },\n        {\n            \"distanceToNext\": 1,\n            \"routeStopId\": 4,\n            \"sequenceOrder\": 4,\n            \"stopId\": 5,\n            \"stopName\": \"Museum Kota Bandung\",\n            \"timeToNext\": 3\n        },\n        {\n            \"distanceToNext\": 1,\n            \"routeStopId\": 5,\n            \"sequenceOrder\": 5,\n            \"stopId\": 6,\n            \"stopName\": \"Merdeka\",\n            \"timeToNext\": 3\n        },\n        {\n            \"distanceToNext\": null,\n            \"routeStopId\": 6,\n            \"sequenceOrder\": 6,\n            \"stopId\": 7,\n            \"stopName\": \"Alun-alun Bandung\",\n            \"timeToNext\": null\n        }\n    ],\n    \"totalDistance\": 5,\n    \"totalStops\": 6\n}"
+								}
+							]
+						},
+						{
+							"name": "Public - Get Buses on Route",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5002/routes/1/buses",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5002",
+									"path": [
+										"routes",
+										"1",
+										"buses"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Public - Get Buses on Route",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:5000/api/route/routes/1/buses",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"route",
+												"routes",
+												"1",
+												"buses"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:13:51 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "119"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"buses\": [],\n    \"error\": \"Bus Service tidak tersedia\",\n    \"routeId\": 1,\n    \"routeName\": \"Rute A\",\n    \"totalBuses\": 0\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Admin",
+					"item": [
+						{
+							"name": "Admin - Create Route Stop",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4xMjM="
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Rute D\",\n  \"description\": \"Rute baru dari Terminal ke Kampus\",\n  \"origin\": \"Terminal Leuwi Panjang\",\n  \"destination\": \"Universitas Padjadjaran\",\n  \"is_active\": true\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5002/admin/routes",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5002",
+									"path": [
+										"admin",
+										"routes"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Admin - Create Route",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4xMjM="
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"Rute D\",\n  \"description\": \"Rute baru dari Terminal ke Kampus\",\n  \"origin\": \"Terminal Leuwi Panjang\",\n  \"destination\": \"Universitas Padjadjaran\",\n  \"is_active\": true\n}"
+										},
+										"url": {
+											"raw": "http://0.0.0.0:5000/api/route/admin/routes/1/stops/add",
+											"protocol": "http",
+											"host": [
+												"0",
+												"0",
+												"0",
+												"0"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"route",
+												"admin",
+												"routes",
+												"1",
+												"stops",
+												"add"
+											]
+										}
+									},
+									"status": "UNAUTHORIZED",
+									"code": 401,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:16:05 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "54"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"error\": \"Unauthorized. Admin access required.\"\n}"
+								},
+								{
+									"name": "Admin - Create Route",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4xMjM="
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n        \"stopId\": 5,\n        \"stopName\": \"Museum Kota Bandung\",\n        \"sequenceOrder\": 9,\n        \"distanceToNext\": 1.0,\n        \"timeToNext\": 3\n}"
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/route/admin/routes/1/stops/add",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"route",
+												"admin",
+												"routes",
+												"1",
+												"stops",
+												"add"
+											]
+										}
+									},
+									"status": "CREATED",
+									"code": 201,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 13 Nov 2025 14:40:03 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "227"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Halte berhasil ditambahkan ke rute.\",\n    \"routeStop\": {\n        \"distanceToNext\": 1,\n        \"routeStopId\": 13,\n        \"sequenceOrder\": 9,\n        \"stopId\": 5,\n        \"stopName\": \"Museum Kota Bandung\",\n        \"timeToNext\": 3\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Admin - Update Route",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4xMjM="
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Rute A Updated\",\n  \"description\": \"Deskripsi baru\",\n  \"is_active\": true\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5002/admin/routes/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5002",
+									"path": [
+										"admin",
+										"routes",
+										"1"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Admin - Update Route",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4xMjM="
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"Rute A Updated\",\n  \"description\": \"Deskripsi baru\",\n  \"is_active\": true\n}"
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/route/admin/routes/1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"route",
+												"admin",
+												"routes",
+												"1"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 13 Nov 2025 14:46:54 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1659"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Rute berhasil diupdate.\",\n    \"route\": {\n        \"description\": \"Deskripsi baru\",\n        \"destination\": \"Matahari Land\",\n        \"isActive\": true,\n        \"name\": \"Rute A Updated\",\n        \"origin\": \"Masjid Jami Baitul Huda Baleendah\",\n        \"routeId\": 1,\n        \"stops\": [\n            {\n                \"distanceToNext\": 1,\n                \"routeStopId\": 1,\n                \"sequenceOrder\": 1,\n                \"stopId\": 2,\n                \"stopName\": \"Masjid Jami Baitul Huda Baleendah\",\n                \"timeToNext\": 3\n            },\n            {\n                \"distanceToNext\": 1,\n                \"routeStopId\": 2,\n                \"sequenceOrder\": 2,\n                \"stopId\": 3,\n                \"stopName\": \"Griya Bandung Asri (GBA)\",\n                \"timeToNext\": 3\n            },\n            {\n                \"distanceToNext\": 1,\n                \"routeStopId\": 3,\n                \"sequenceOrder\": 3,\n                \"stopId\": 4,\n                \"stopName\": \"Sekolah Moh Toha\",\n                \"timeToNext\": 3\n            },\n            {\n                \"distanceToNext\": 1,\n                \"routeStopId\": 4,\n                \"sequenceOrder\": 4,\n                \"stopId\": 5,\n                \"stopName\": \"Museum Kota Bandung\",\n                \"timeToNext\": 3\n            },\n            {\n                \"distanceToNext\": 1,\n                \"routeStopId\": 5,\n                \"sequenceOrder\": 5,\n                \"stopId\": 6,\n                \"stopName\": \"Merdeka\",\n                \"timeToNext\": 3\n            },\n            {\n                \"distanceToNext\": null,\n                \"routeStopId\": 6,\n                \"sequenceOrder\": 6,\n                \"stopId\": 7,\n                \"stopName\": \"Alun-alun Bandung\",\n                \"timeToNext\": null\n            },\n            {\n                \"distanceToNext\": 1,\n                \"routeStopId\": 13,\n                \"sequenceOrder\": 9,\n                \"stopId\": 5,\n                \"stopName\": \"Museum Kota Bandung\",\n                \"timeToNext\": 3\n            }\n        ],\n        \"totalDistance\": 6,\n        \"totalStops\": 7\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Admin - Delete Route",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4xMjM="
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5002/admin/routes/3",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5002",
+									"path": [
+										"admin",
+										"routes",
+										"3"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Admin - Delete Route",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4xMjM="
+											}
+										],
+										"url": {
+											"raw": "http://localhost:5000/api/route/admin/routes/3",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"route",
+												"admin",
+												"routes",
+												"3"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:24:30 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "52"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Rute Koridor 1 berhasil dihapus.\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Admin - Create Route",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5000/api/route/admin/routes/add",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"route",
+										"admin",
+										"routes",
+										"add"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "New Request",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{        \"name\": \"Rute A\",\r\n        \"description\": \"Rute dari Masjid ke Matahari Land\",\r\n        \"origin\": \"Masjid Jami Baitul Huda Baleendah\",\r\n        \"destination\": \"Matahari Land\",\r\n        \"stops\": [\r\n            {\"stopId\": 2, \"stopName\": \"Masjid Jami Baitul Huda Baleendah\", \"distanceToNext\": 1.0, \"timeToNext\": 3},\r\n            {\"stopId\": 3, \"stopName\": \"Griya Bandung Asri (GBA)\", \"distanceToNext\": 1.0, \"timeToNext\": 3}\r\n        ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/route/admin/routes/add",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"route",
+												"admin",
+												"routes",
+												"add"
+											]
+										}
+									},
+									"status": "CREATED",
+									"code": 201,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 13 Nov 2025 14:42:58 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "737"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Rute berhasil ditambahkan.\",\n    \"route\": {\n        \"description\": \"Rute dari Masjid ke Matahari Land\",\n        \"destination\": \"Matahari Land\",\n        \"isActive\": true,\n        \"name\": \"Rute A\",\n        \"origin\": \"Masjid Jami Baitul Huda Baleendah\",\n        \"routeId\": 3,\n        \"stops\": [\n            {\n                \"distanceToNext\": 1,\n                \"routeStopId\": 14,\n                \"sequenceOrder\": 1,\n                \"stopId\": 2,\n                \"stopName\": \"Masjid Jami Baitul Huda Baleendah\",\n                \"timeToNext\": 3\n            },\n            {\n                \"distanceToNext\": 1,\n                \"routeStopId\": 15,\n                \"sequenceOrder\": 2,\n                \"stopId\": 3,\n                \"stopName\": \"Griya Bandung Asri (GBA)\",\n                \"timeToNext\": 3\n            }\n        ],\n        \"totalDistance\": 2,\n        \"totalStops\": 2\n    }\n}"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "3. Stop Service (5003)",
+			"item": [
+				{
+					"name": "Public",
+					"item": [
+						{
+							"name": "Public - Get All Stops",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5003/stops",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5003",
+									"path": [
+										"stops"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Public - Get All Stops",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:5000/api/stop/stops",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"stop",
+												"stops"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:36:38 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "8702"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"stops\": [\n        {\n            \"address\": \"Halte Awal Arah Pergi\",\n            \"coordinates\": {\n                \"latitude\": -7.0305,\n                \"longitude\": 107.6327\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": true,\n                \"guiding_block\": false,\n                \"lighting\": true,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Halte Updated\",\n            \"stopId\": 1\n        },\n        {\n            \"address\": \"Halte 2\",\n            \"coordinates\": {\n                \"latitude\": -7.031,\n                \"longitude\": 107.633\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": false,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": false,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Masjid Jami Baitul Huda Baleendah\",\n            \"stopId\": 2\n        },\n        {\n            \"address\": \"Halte 3\",\n            \"coordinates\": {\n                \"latitude\": -7,\n                \"longitude\": 107.65\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": false,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Griya Bandung Asri (GBA)\",\n            \"stopId\": 3\n        },\n        {\n            \"address\": \"Halte 4\",\n            \"coordinates\": {\n                \"latitude\": -6.95,\n                \"longitude\": 107.62\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": false,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Sekolah Moh Toha\",\n            \"stopId\": 4\n        },\n        {\n            \"address\": \"Halte 5\",\n            \"coordinates\": {\n                \"latitude\": -6.92,\n                \"longitude\": 107.61\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": false,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Museum Kota Bandung\",\n            \"stopId\": 5\n        },\n        {\n            \"address\": \"Halte 6\",\n            \"coordinates\": {\n                \"latitude\": -6.9195,\n                \"longitude\": 107.6105\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": false,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": false,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Merdeka\",\n            \"stopId\": 6\n        },\n        {\n            \"address\": \"Halte 7\",\n            \"coordinates\": {\n                \"latitude\": -6.9217,\n                \"longitude\": 107.6074\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": false,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": true\n            },\n            \"name\": \"Alun-alun Bandung\",\n            \"stopId\": 7\n        },\n        {\n            \"address\": \"Halte 8\",\n            \"coordinates\": {\n                \"latitude\": -6.9185,\n                \"longitude\": 107.605\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": false,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Simpang Ijan\",\n            \"stopId\": 8\n        },\n        {\n            \"address\": \"Halte 9\",\n            \"coordinates\": {\n                \"latitude\": -6.9147,\n                \"longitude\": 107.6015\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": true,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Stasiun Bandung\",\n            \"stopId\": 9\n        },\n        {\n            \"address\": \"Halte Akhir Arah Pergi\",\n            \"coordinates\": {\n                \"latitude\": -6.913,\n                \"longitude\": 107.6067\n            },\n            \"facilities\": {\n                \"charging_port\": true,\n                \"digital_eta_display\": true,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Bandung Electronic Centre (BEC)\",\n            \"stopId\": 10\n        },\n        {\n            \"address\": \"Halte Awal Arah Balik\",\n            \"coordinates\": {\n                \"latitude\": -6.9135,\n                \"longitude\": 107.607\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": true,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Bandung Electronic Centre (BEC) B\",\n            \"stopId\": 11\n        },\n        {\n            \"address\": \"Halte 12\",\n            \"coordinates\": {\n                \"latitude\": -6.915,\n                \"longitude\": 107.602\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": false,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Stasiun Bandung B\",\n            \"stopId\": 12\n        },\n        {\n            \"address\": \"Halte 13\",\n            \"coordinates\": {\n                \"latitude\": -6.919,\n                \"longitude\": 107.6045\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": false,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"SMAN 6 Bandung\",\n            \"stopId\": 13\n        },\n        {\n            \"address\": \"Halte 14\",\n            \"coordinates\": {\n                \"latitude\": -6.918,\n                \"longitude\": 107.6055\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": false,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Simpang Ijan B\",\n            \"stopId\": 14\n        },\n        {\n            \"address\": \"Halte 15\",\n            \"coordinates\": {\n                \"latitude\": -6.922,\n                \"longitude\": 107.6078\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": false,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": true\n            },\n            \"name\": \"Alun-alun Bandung B\",\n            \"stopId\": 15\n        },\n        {\n            \"address\": \"Halte 16\",\n            \"coordinates\": {\n                \"latitude\": -6.9205,\n                \"longitude\": 107.609\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": false,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": false,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Kepatihan B\",\n            \"stopId\": 16\n        },\n        {\n            \"address\": \"Halte 17\",\n            \"coordinates\": {\n                \"latitude\": -6.955,\n                \"longitude\": 107.625\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": false,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"RS Bersalin B\",\n            \"stopId\": 17\n        },\n        {\n            \"address\": \"Halte 18\",\n            \"coordinates\": {\n                \"latitude\": -7.005,\n                \"longitude\": 107.645\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": false,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Podomoro B\",\n            \"stopId\": 18\n        },\n        {\n            \"address\": \"Halte 19\",\n            \"coordinates\": {\n                \"latitude\": -7.02,\n                \"longitude\": 107.635\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": false,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Transmart Buah Batu B\",\n            \"stopId\": 19\n        },\n        {\n            \"address\": \"Halte Akhir Arah Balik\",\n            \"coordinates\": {\n                \"latitude\": -7.03,\n                \"longitude\": 107.632\n            },\n            \"facilities\": {\n                \"charging_port\": false,\n                \"digital_eta_display\": true,\n                \"guiding_block\": false,\n                \"lighting\": false,\n                \"seating\": false,\n                \"shelter\": true,\n                \"wheelchair_access\": false\n            },\n            \"name\": \"Baleendah B\",\n            \"stopId\": 20\n        }\n    ],\n    \"total\": 20\n}"
+								}
+							]
+						},
+						{
+							"name": "Public - Get Stop Detail",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5003/stops/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5003",
+									"path": [
+										"stops",
+										"1"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Public - Get Stop Detail",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:5000/api/stop/stops/1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"stop",
+												"stops",
+												"1"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "",
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 14 Nov 2025 10:18:53 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "366"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"address\": \"Halte Awal Arah Pergi\",\n    \"coordinates\": {\n        \"latitude\": -7.0305,\n        \"longitude\": 107.6327\n    },\n    \"facilities\": {\n        \"charging_port\": false,\n        \"digital_eta_display\": true,\n        \"guiding_block\": false,\n        \"lighting\": true,\n        \"seating\": false,\n        \"shelter\": true,\n        \"wheelchair_access\": false\n    },\n    \"name\": \"Halte Updated\",\n    \"stopId\": 1\n}"
+								}
+							]
+						},
+						{
+							"name": "Public - Search Stops",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5003/stops/search?query=Baleendah",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5003",
+									"path": [
+										"stops",
+										"search"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "Baleendah"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Public - Search Stops",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:5000/api/stop/stops/search?query=Baleendah",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"stop",
+												"stops",
+												"search"
+											],
+											"query": [
+												{
+													"key": "query",
+													"value": "Baleendah"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "",
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 14 Nov 2025 10:19:15 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "814"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										}
+									],
+									"cookie": [],
+									"body": "[\n    {\n        \"address\": \"Halte 2\",\n        \"coordinates\": {\n            \"latitude\": -7.031,\n            \"longitude\": 107.633\n        },\n        \"facilities\": {\n            \"charging_port\": false,\n            \"digital_eta_display\": false,\n            \"guiding_block\": false,\n            \"lighting\": false,\n            \"seating\": false,\n            \"shelter\": false,\n            \"wheelchair_access\": false\n        },\n        \"name\": \"Masjid Jami Baitul Huda Baleendah\",\n        \"stopId\": 2\n    },\n    {\n        \"address\": \"Halte Akhir Arah Balik\",\n        \"coordinates\": {\n            \"latitude\": -7.03,\n            \"longitude\": 107.632\n        },\n        \"facilities\": {\n            \"charging_port\": false,\n            \"digital_eta_display\": true,\n            \"guiding_block\": false,\n            \"lighting\": false,\n            \"seating\": false,\n            \"shelter\": true,\n            \"wheelchair_access\": false\n        },\n        \"name\": \"Baleendah B\",\n        \"stopId\": 20\n    }\n]"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Admin",
+					"item": [
+						{
+							"name": "Admin - Create Stop",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4xMjM="
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Halte Baru ITB\",\n  \"address\": \"Jl. Ganesha No. 10, Bandung\",\n  \"latitude\": -6.8915,\n  \"longitude\": 107.6107,\n  \"shelter\": true,\n  \"seating\": true,\n  \"lighting\": true,\n  \"wheelchair_access\": true,\n  \"digital_eta_display\": true\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5003/admin/stops",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5003",
+									"path": [
+										"admin",
+										"stops"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Admin - Create Stop",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4xMjM=",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"Halte Baru ITB\",\n  \"address\": \"Jl. Ganesha No. 10, Bandung\",\n  \"latitude\": -6.8915,\n  \"longitude\": 107.6107,\n  \"shelter\": true,\n  \"seating\": true,\n  \"lighting\": true,\n  \"wheelchair_access\": true,\n  \"digital_eta_display\": true\n}"
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/stop/admin/stops/add",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"stop",
+												"admin",
+												"stops",
+												"add"
+											]
+										}
+									},
+									"status": "CREATED",
+									"code": 201,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:30:56 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "464"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Halte berhasil ditambahkan.\",\n    \"stop\": {\n        \"address\": \"Jl. Ganesha No. 10, Bandung\",\n        \"coordinates\": {\n            \"latitude\": -6.8915,\n            \"longitude\": 107.6107\n        },\n        \"facilities\": {\n            \"charging_port\": false,\n            \"digital_eta_display\": true,\n            \"guiding_block\": false,\n            \"lighting\": true,\n            \"seating\": true,\n            \"shelter\": true,\n            \"wheelchair_access\": true\n        },\n        \"name\": \"Halte Baru ITB\",\n        \"stopId\": 21\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Admin - Update Stop",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4xMjM="
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Halte Updated\",\n  \"shelter\": true,\n  \"digital_eta_display\": true\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5003/admin/stops/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5003",
+									"path": [
+										"admin",
+										"stops",
+										"1"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Admin - Update Stop",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4xMjM="
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"Halte Updated\",\n  \"shelter\": true,\n  \"digital_eta_display\": true\n}"
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/stop/admin/stops/1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"stop",
+												"admin",
+												"stops",
+												"1"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:31:06 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "455"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Halte berhasil diupdate.\",\n    \"stop\": {\n        \"address\": \"Halte Awal Arah Pergi\",\n        \"coordinates\": {\n            \"latitude\": -7.0305,\n            \"longitude\": 107.6327\n        },\n        \"facilities\": {\n            \"charging_port\": false,\n            \"digital_eta_display\": true,\n            \"guiding_block\": false,\n            \"lighting\": true,\n            \"seating\": false,\n            \"shelter\": true,\n            \"wheelchair_access\": false\n        },\n        \"name\": \"Halte Updated\",\n        \"stopId\": 1\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Admin - Delete Stop",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4xMjM="
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5003/admin/stops/21",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5003",
+									"path": [
+										"admin",
+										"stops",
+										"21"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Admin - Delete Stop",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4xMjM=",
+												"disabled": true
+											}
+										],
+										"url": {
+											"raw": "http://localhost:5000/api/stop/admin/stops/1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"stop",
+												"admin",
+												"stops",
+												"1"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "",
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 14 Nov 2025 10:20:00 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "57"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Halte Halte Updated berhasil dihapus.\"\n}"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "4. Bus Service (5004)",
+			"item": [
+				{
+					"name": "Public",
+					"item": [
+						{
+							"name": "Public - Get All Buses",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5004/buses",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5004",
+									"path": [
+										"buses"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Public - Get All Buses",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:5000/api/bus/buses",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"bus",
+												"buses"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:03:15 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "2608"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"buses\": [\n        {\n            \"busId\": 1,\n            \"kapasitas_penumpang\": 50,\n            \"lokasi_geografis\": {\n                \"latitude\": -6.9175,\n                \"longitude\": 107.6191\n            },\n            \"model_kendaraan\": \"Mercedes-Benz OH 1526\",\n            \"nomor_polisi\": \"B 1234 ABC\",\n            \"operational_status\": \"In Service\",\n            \"route\": {\n                \"routeId\": 1,\n                \"routeName\": \"Rute A\"\n            },\n            \"speed\": {\n                \"average\": 45,\n                \"current\": 45\n            },\n            \"status_gps\": \"Online\"\n        },\n        {\n            \"busId\": 2,\n            \"kapasitas_penumpang\": 45,\n            \"lokasi_geografis\": {\n                \"latitude\": 0,\n                \"longitude\": 0\n            },\n            \"model_kendaraan\": \"Hino RK8\",\n            \"nomor_polisi\": \"B 5678 DEF\",\n            \"operational_status\": \"In Service\",\n            \"route\": {\n                \"routeId\": 1,\n                \"routeName\": \"Rute A\"\n            },\n            \"speed\": {\n                \"average\": 42,\n                \"current\": 0\n            },\n            \"status_gps\": \"Offline\"\n        },\n        {\n            \"busId\": 3,\n            \"kapasitas_penumpang\": 50,\n            \"lokasi_geografis\": {\n                \"latitude\": 0,\n                \"longitude\": 0\n            },\n            \"model_kendaraan\": \"Scania K310\",\n            \"nomor_polisi\": \"B 9012 GHI\",\n            \"operational_status\": \"In Service\",\n            \"route\": {\n                \"routeId\": 2,\n                \"routeName\": \"Rute B\"\n            },\n            \"speed\": {\n                \"average\": 48,\n                \"current\": 0\n            },\n            \"status_gps\": \"Offline\"\n        },\n        {\n            \"busId\": 4,\n            \"kapasitas_penumpang\": 40,\n            \"lokasi_geografis\": {\n                \"latitude\": 0,\n                \"longitude\": 0\n            },\n            \"model_kendaraan\": \"Isuzu NQR\",\n            \"nomor_polisi\": \"B 3456 JKL\",\n            \"operational_status\": \"In Service\",\n            \"route\": {\n                \"routeId\": 3,\n                \"routeName\": \"Koridor 1\"\n            },\n            \"speed\": {\n                \"average\": 40,\n                \"current\": 0\n            },\n            \"status_gps\": \"Offline\"\n        },\n        {\n            \"busId\": 5,\n            \"kapasitas_penumpang\": 50,\n            \"lokasi_geografis\": {\n                \"latitude\": 0,\n                \"longitude\": 0\n            },\n            \"model_kendaraan\": \"Mercedes-Benz OH 1526\",\n            \"nomor_polisi\": \"B 7890 MNO\",\n            \"operational_status\": \"Available\",\n            \"speed\": {\n                \"average\": 44,\n                \"current\": 0\n            },\n            \"status_gps\": \"Offline\"\n        },\n        {\n            \"busId\": 6,\n            \"kapasitas_penumpang\": 45,\n            \"lokasi_geografis\": {\n                \"latitude\": 0,\n                \"longitude\": 0\n            },\n            \"model_kendaraan\": \"Hino RK8\",\n            \"nomor_polisi\": \"B 1122 PQR\",\n            \"operational_status\": \"Maintenance\",\n            \"speed\": {\n                \"average\": 43,\n                \"current\": 0\n            },\n            \"status_gps\": \"Offline\"\n        }\n    ],\n    \"total\": 6\n}"
+								}
+							]
+						},
+						{
+							"name": "Public - Get Bus Detail",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5004/buses/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5004",
+									"path": [
+										"buses",
+										"1"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Public - Get Bus Detail",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:5000/api/bus/buses/1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"bus",
+												"buses",
+												"1"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:03:33 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "327"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"busId\": 1,\n    \"kapasitas_penumpang\": 50,\n    \"lokasi_geografis\": {\n        \"latitude\": -6.9175,\n        \"longitude\": 107.6191\n    },\n    \"model_kendaraan\": \"Mercedes-Benz OH 1526\",\n    \"nomor_polisi\": \"B 1234 ABC\",\n    \"operational_status\": \"In Service\",\n    \"speed\": {\n        \"average\": 45,\n        \"current\": 45\n    },\n    \"status_gps\": \"Online\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Public - Update Bus Location",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"latitude\": -6.9175,\n  \"longitude\": 107.6191,\n  \"current_speed\": 45,\n  \"status_gps\": \"Online\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5004/buses/1/location",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5004",
+									"path": [
+										"buses",
+										"1",
+										"location"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Public - Update Bus Location",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"latitude\": -6.9175,\n  \"longitude\": 107.6191,\n  \"current_speed\": 45,\n  \"status_gps\": \"Online\"\n}"
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/bus/buses/1/location",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"bus",
+												"buses",
+												"1",
+												"location"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:03:47 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "389"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"busId\": 1,\n    \"kapasitas_penumpang\": 50,\n    \"lokasi_geografis\": {\n        \"latitude\": -6.9175,\n        \"longitude\": 107.6191\n    },\n    \"model_kendaraan\": \"Mercedes-Benz OH 1526\",\n    \"nomor_polisi\": \"B 1234 ABC\",\n    \"operational_status\": \"In Service\",\n    \"route\": {\n        \"routeId\": 1,\n        \"routeName\": \"Rute A\"\n    },\n    \"speed\": {\n        \"average\": 45,\n        \"current\": 45\n    },\n    \"status_gps\": \"Online\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Admin",
+					"item": [
+						{
+							"name": "Admin - Register Bus",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4xMjM="
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"nomor_polisi\": \"D 7777 XYZ\",\n  \"kapasitas_penumpang\": 50,\n  \"model_kendaraan\": \"Mercedes-Benz OH 1526\",\n  \"average_speed\": 40,\n  \"operational_status\": \"Available\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5004/admin/buses",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5004",
+									"path": [
+										"admin",
+										"buses"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Admin - Register Bus",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4xMjM="
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"nomor_polisi\": \"D 7777 XYZADS\",\n  \"kapasitas_penumpang\": 50,\n  \"model_kendaraan\": \"Mercedes-Benz OH 1526\",\n  \"average_speed\": 40,\n  \"operational_status\": \"Available\"\n}"
+										},
+										"url": {
+											"raw": "http://0.0.0.0:5000/api/bus/admin/buses/add",
+											"protocol": "http",
+											"host": [
+												"0",
+												"0",
+												"0",
+												"0"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"bus",
+												"admin",
+												"buses",
+												"add"
+											]
+										}
+									},
+									"status": "CREATED",
+									"code": 201,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:20:40 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "320"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"busId\": 7,\n    \"kapasitas_penumpang\": 50,\n    \"lokasi_geografis\": {\n        \"latitude\": 0,\n        \"longitude\": 0\n    },\n    \"model_kendaraan\": \"Mercedes-Benz OH 1526\",\n    \"nomor_polisi\": \"D 7777 XYZADS\",\n    \"operational_status\": \"Available\",\n    \"speed\": {\n        \"average\": 40,\n        \"current\": 0\n    },\n    \"status_gps\": \"Offline\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Admin - Assign Bus to Route",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4xMjM="
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"route_id\": 1\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5004/admin/buses/1/assign",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5004",
+									"path": [
+										"admin",
+										"buses",
+										"1",
+										"assign"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Admin - Assign Bus to Route",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4xMjM="
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"route_id\": 2\n}"
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/bus/admin/buses/1/route/assign",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"bus",
+												"admin",
+												"buses",
+												"1",
+												"route",
+												"assign"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:22:56 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "568"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"bus\": {\n        \"busId\": 1,\n        \"kapasitas_penumpang\": 50,\n        \"lokasi_geografis\": {\n            \"latitude\": -6.9175,\n            \"longitude\": 107.6191\n        },\n        \"model_kendaraan\": \"Mercedes-Benz OH 1526\",\n        \"nomor_polisi\": \"B 1234 ABC\",\n        \"operational_status\": \"In Service\",\n        \"route\": {\n            \"routeId\": 2,\n            \"routeName\": \"Route 2\"\n        },\n        \"speed\": {\n            \"average\": 45,\n            \"current\": 45\n        },\n        \"status_gps\": \"Online\"\n    },\n    \"message\": \"Bus B 1234 ABC di-assign ke route (Route Service unavailable)\",\n    \"warning\": \"Tidak dapat memvalidasi route_id\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Admin - Update Bus Status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4xMjM="
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operational_status\": \"In Service\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5004/admin/buses/1/status",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5004",
+									"path": [
+										"admin",
+										"buses",
+										"1",
+										"status"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Admin - Update Bus Status",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4xMjM="
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"operational_status\": \"In Service\"\n}"
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/bus/admin/buses/1/status",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"bus",
+												"admin",
+												"buses",
+												"1",
+												"status"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:23:12 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "497"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"bus\": {\n        \"busId\": 1,\n        \"kapasitas_penumpang\": 50,\n        \"lokasi_geografis\": {\n            \"latitude\": -6.9175,\n            \"longitude\": 107.6191\n        },\n        \"model_kendaraan\": \"Mercedes-Benz OH 1526\",\n        \"nomor_polisi\": \"B 1234 ABC\",\n        \"operational_status\": \"In Service\",\n        \"route\": {\n            \"routeId\": 2,\n            \"routeName\": \"Route 2\"\n        },\n        \"speed\": {\n            \"average\": 45,\n            \"current\": 45\n        },\n        \"status_gps\": \"Online\"\n    },\n    \"message\": \"Status bus B 1234 ABC berhasil diupdate\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Admin - Delete Bus",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4xMjM="
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5004/admin/buses/7",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5004",
+									"path": [
+										"admin",
+										"buses",
+										"7"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Admin - Delete Bus",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4xMjM="
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/bus/admin/buses/1/route/unassign",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"bus",
+												"admin",
+												"buses",
+												"1",
+												"route",
+												"unassign"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:23:26 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "434"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"bus\": {\n        \"busId\": 1,\n        \"kapasitas_penumpang\": 50,\n        \"lokasi_geografis\": {\n            \"latitude\": -6.9175,\n            \"longitude\": 107.6191\n        },\n        \"model_kendaraan\": \"Mercedes-Benz OH 1526\",\n        \"nomor_polisi\": \"B 1234 ABC\",\n        \"operational_status\": \"Available\",\n        \"speed\": {\n            \"average\": 45,\n            \"current\": 45\n        },\n        \"status_gps\": \"Online\"\n    },\n    \"message\": \"Bus B 1234 ABC berhasil di-unassign dari Route 2\"\n}"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "5. Schedule Service (5005)",
+			"item": [
+				{
+					"name": "Public",
+					"item": [
+						{
+							"name": "Public - Get Schedules by Route",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5005/schedules/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5005",
+									"path": [
+										"schedules",
+										"1"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Public - Get Schedules by Route",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:5000/api/schedule/schedules/1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"schedule",
+												"schedules",
+												"1"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:35:28 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "683"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"routeId\": 1,\n    \"routeName\": \"Rute A\",\n    \"schedules\": [\n        {\n            \"busId\": 1,\n            \"busNumber\": \"B 1234 ABC\",\n            \"createdAt\": \"2025-11-12T02:47:31.613192\",\n            \"departureTime\": \"08:30\",\n            \"frequencyMinutes\": 20,\n            \"isActive\": true,\n            \"operatingDays\": \"Daily\",\n            \"routeId\": 1,\n            \"routeName\": \"Rute A\",\n            \"scheduleId\": 1\n        },\n        {\n            \"busId\": 2,\n            \"busNumber\": \"B 5678 DEF\",\n            \"createdAt\": \"2025-11-12T02:47:31.613194\",\n            \"departureTime\": \"06:15\",\n            \"frequencyMinutes\": 15,\n            \"isActive\": true,\n            \"operatingDays\": \"Daily\",\n            \"routeId\": 1,\n            \"routeName\": \"Rute A\",\n            \"scheduleId\": 2\n        }\n    ],\n    \"total\": 2\n}"
+								}
+							]
+						},
+						{
+							"name": "Public - Calculate ETA",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5005/eta?busId=1&stopId=5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5005",
+									"path": [
+										"eta"
+									],
+									"query": [
+										{
+											"key": "busId",
+											"value": "1"
+										},
+										{
+											"key": "stopId",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Public - Calculate ETA",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:5000/api/schedule/eta?busId=2&stopId=1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"schedule",
+												"eta"
+											],
+											"query": [
+												{
+													"key": "busId",
+													"value": "2"
+												},
+												{
+													"key": "stopId",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"status": "NOT FOUND",
+									"code": 404,
+									"_postman_previewlanguage": "",
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 14 Nov 2025 09:58:06 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "70"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"error\": \"Bus tidak ditemukan atau Bus Service tidak tersedia.\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Public - Get Arrivals at Stop",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5005/stops/5/arrivals",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5005",
+									"path": [
+										"stops",
+										"5",
+										"arrivals"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Public - Get Arrivals at Stop",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/schedule/stops/13/arrivals",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"schedule",
+												"stops",
+												"13",
+												"arrivals"
+											]
+										}
+									},
+									"status": "NOT FOUND",
+									"code": 404,
+									"_postman_previewlanguage": "",
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 14 Nov 2025 09:58:17 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "40"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"error\": \"Halte tidak ditemukan.\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Public - Next Departures",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": [
+								{
+									"name": "New Request",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:5000/api/schedule/routes/1/next-departures",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"schedule",
+												"routes",
+												"1",
+												"next-departures"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "",
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 14 Nov 2025 09:58:24 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "394"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"currentTime\": \"09:58\",\n    \"nextDepartures\": [\n        {\n            \"busId\": 1,\n            \"busNumber\": \"aaaa\",\n            \"createdAt\": \"2025-11-14T04:17:53.124395\",\n            \"departureTime\": \"10:05\",\n            \"frequencyMinutes\": null,\n            \"isActive\": true,\n            \"operatingDays\": \"Daily\",\n            \"routeId\": 1,\n            \"routeName\": \"Route 1\",\n            \"scheduleId\": 6\n        }\n    ],\n    \"routeId\": 1,\n    \"totalDepartures\": 1\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Admin",
+					"item": [
+						{
+							"name": "Admin - Get Schedule",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTc2Mjk2MzM2NiwiaWF0IjoxNzYyOTYxNTY2fQ.MJR-UYneFEQyJSuXtEdBorHZlWAMVdSQf1uPC7uW-Ac",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4xMjM="
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"route_id\": 1,\n  \"bus_id\": 1,\n  \"departure_time\": \"08:00\",\n  \"frequency_minutes\": 15,\n  \"is_active\": true\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/schedule/admin/schedules",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"schedule",
+										"admin",
+										"schedules"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Admin - Create Schedule",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4xMjM="
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"route_id\": 1,\n  \"bus_id\": 1,\n  \"departure_time\": \"08:00\",\n  \"frequency_minutes\": 15,\n  \"is_active\": true\n}"
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/schedule/admin/schedules",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"schedule",
+												"admin",
+												"schedules"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:33:54 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1249"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"schedules\": [\n        {\n            \"busId\": 1,\n            \"busNumber\": \"B 1234 ABC\",\n            \"createdAt\": \"2025-11-12T02:47:31.613192\",\n            \"departureTime\": \"06:00\",\n            \"frequencyMinutes\": 15,\n            \"isActive\": true,\n            \"operatingDays\": \"Daily\",\n            \"routeId\": 1,\n            \"routeName\": \"Rute A\",\n            \"scheduleId\": 1\n        },\n        {\n            \"busId\": 2,\n            \"busNumber\": \"B 5678 DEF\",\n            \"createdAt\": \"2025-11-12T02:47:31.613194\",\n            \"departureTime\": \"06:15\",\n            \"frequencyMinutes\": 15,\n            \"isActive\": true,\n            \"operatingDays\": \"Daily\",\n            \"routeId\": 1,\n            \"routeName\": \"Rute A\",\n            \"scheduleId\": 2\n        },\n        {\n            \"busId\": 3,\n            \"busNumber\": \"B 9012 GHI\",\n            \"createdAt\": \"2025-11-12T02:47:31.613194\",\n            \"departureTime\": \"06:30\",\n            \"frequencyMinutes\": 20,\n            \"isActive\": true,\n            \"operatingDays\": \"Daily\",\n            \"routeId\": 2,\n            \"routeName\": \"Rute B\",\n            \"scheduleId\": 3\n        },\n        {\n            \"busId\": 4,\n            \"busNumber\": \"B 3456 JKL\",\n            \"createdAt\": \"2025-11-12T02:47:31.613195\",\n            \"departureTime\": \"07:00\",\n            \"frequencyMinutes\": 30,\n            \"isActive\": true,\n            \"operatingDays\": \"Daily\",\n            \"routeId\": 3,\n            \"routeName\": \"Koridor 1\",\n            \"scheduleId\": 4\n        }\n    ],\n    \"total\": 4\n}"
+								}
+							]
+						},
+						{
+							"name": "Admin - Update Schedule",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4xMjM="
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"departure_time\": \"08:30\",\n  \"frequency_minutes\": 20,\n  \"is_active\": true\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5005/admin/schedules/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5005",
+									"path": [
+										"admin",
+										"schedules",
+										"1"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Admin - Update Schedule",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4xMjM="
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"departure_time\": \"08:30\",\n  \"frequency_minutes\": 20,\n  \"is_active\": true\n}"
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/schedule/admin/schedules/1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"schedule",
+												"admin",
+												"schedules",
+												"1"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:34:47 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "335"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Jadwal berhasil diupdate.\",\n    \"schedule\": {\n        \"busId\": 1,\n        \"busNumber\": \"B 1234 ABC\",\n        \"createdAt\": \"2025-11-12T02:47:31.613192\",\n        \"departureTime\": \"08:30\",\n        \"frequencyMinutes\": 20,\n        \"isActive\": true,\n        \"operatingDays\": \"Daily\",\n        \"routeId\": 1,\n        \"routeName\": \"Rute A\",\n        \"scheduleId\": 1\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Admin - Delete Schedule",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4xMjM="
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5005/admin/schedules/5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5005",
+									"path": [
+										"admin",
+										"schedules",
+										"5"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Admin - Delete Schedule",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4xMjM="
+											}
+										],
+										"url": {
+											"raw": "http://localhost:5000/api/schedule/admin/schedules/3",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"schedule",
+												"admin",
+												"schedules",
+												"3"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:35:15 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "57"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Jadwal untuk Rute B berhasil dihapus.\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Admin - Add Schedule",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbjIiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3NjI5NjQ4ODUsImlhdCI6MTc2Mjk2MzA4NX0.rzzjOyK_nCHQrjBXb3pkLEiUVSEScZJXgeSC3fvEWPc",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "    {\r\n        \"route_id\": 1,\r\n        \"route_name\": \"Rute A\",\r\n        \"bus_id\": 1,\r\n        \"bus_number\": \"B 1234 ABC\",\r\n        \"departure_time\": \"06:00\",\r\n        \"operating_days\": \"Daily\",\r\n        \"frequency_minutes\": 15\r\n    }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/schedule/admin/schedules/add",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"schedule",
+										"admin",
+										"schedules",
+										"add"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Admin - Add Schedule",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "    {\r\n        \"route_id\": 1,\r\n        \"route_name\": \"Rute A\",\r\n        \"bus_id\": 1,\r\n        \"bus_number\": \"B 1234 ABC\",\r\n        \"departure_time\": \"06:00\",\r\n        \"operating_days\": \"Daily\",\r\n        \"frequency_minutes\": 15\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/schedule/admin/schedules/add",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"schedule",
+												"admin",
+												"schedules",
+												"add"
+											]
+										}
+									},
+									"status": "CREATED",
+									"code": 201,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "gunicorn"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 12 Nov 2025 15:58:16 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "338"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Jadwal berhasil ditambahkan.\",\n    \"schedule\": {\n        \"busId\": 1,\n        \"busNumber\": \"B 1234 ABC\",\n        \"createdAt\": \"2025-11-12T15:58:16.944650\",\n        \"departureTime\": \"06:00\",\n        \"frequencyMinutes\": 15,\n        \"isActive\": true,\n        \"operatingDays\": \"Daily\",\n        \"routeId\": 1,\n        \"routeName\": \"Rute A\",\n        \"scheduleId\": 5\n    }\n}"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}

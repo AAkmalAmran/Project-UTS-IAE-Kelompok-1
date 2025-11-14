@@ -890,7 +890,7 @@
             const body = {
                 route_id: parseInt(routeId)
             };
-            await fetchAdminAPI(endpoint, 'POST', body);
+            await fetchAdminAPI(endpoint, 'PUT', body);
             e.target.reset();
         }
 
@@ -912,7 +912,7 @@
             const busId = document.getElementById('unassign-bus-id').value;
             const endpoint = `/bus/admin/buses/${busId}/route/unassign`;
             
-            await fetchAdminAPI(endpoint, 'POST', null);
+            await fetchAdminAPI(endpoint, 'DELETE', null);
             e.target.reset();
         }
 

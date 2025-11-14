@@ -23,55 +23,46 @@ Proyek ini dirancang untuk dijalankan dan dikelola menggunakan **Docker Desktop*
 
 graph TB
 
-    Client[Frontend Client] --> Gateway[API Gateway]
-
-    Gateway --> Service1[User Service]
-    Gateway --> Service2[Bus Service]
-    Gateway --> Service3[Stop Service]
-    Gateway --> Service4[Route Service]
-    Gateway --> Service5[Schedule Service]
-
-    Service1 -.->|HTTP Response| Service2
-    Service1 -.->|HTTP Response| Service3
-    Service1 -.->|HTTP Response| Service4
-    Service1 -.->|HTTP Response| Service5
-
-    Service4 <-.->|HTTP Request/Response| Service2
-    Service4 -.->|HTTP Request/Response| Service3
-
-    Service5 <-.->|HTTP Request| Service2
-    Service5 <-.->|HTTP Request| Service3
-    Service5 <-.->|HTTP Request| Service4
-
-    
-
-    subgraph ServiceLayer [Service Layer]
-
-        Service1
-        Service2
-        Service3
-        Service4
-        Service5
-
-    end
-
-    
-
-    subgraph DataLayer [Data Layer]
-
-        DB1[(User.db)]
-        DB2[(Bus.db)]
-        DB3[(Stop.db)]
-        DB4[(Route.db)]
-        DB5[(Schedule.db)]
-
-    end
-
+flowchart TB
+ subgraph ServiceLayer["Service Layer"]
+        Service1["User Service"]
+        Service2["Bus Service"]
+        Service3["Stop Service"]
+        Service4["Route Service"]
+        Service5["Schedule Service"]
+  end
+ subgraph DataLayer["Data Layer"]
+        DB1[("User.db")]
+        DB2[("Bus.db")]
+        DB3[("Stop.db")]
+        DB4[("Route.db")]
+        DB5[("Schedule.db")]
+  end
+    Client["Frontend Client"] --> Gateway["API Gateway"]
+    Gateway --> Service1 & Service2 & Service3 & Service4 & Service5
+    Service1 -. HTTP Response .-> Service2 & Service3 & Service4 & Service5
+    Service4 <-. HTTP Request/Response .-> Service2
+    Service4 -. HTTP Request/Response .-> Service3
+    Service5 -. HTTP Request .-> Service2 & Service3 & Service4
     Service1 --> DB1
     Service2 --> DB2
     Service3 --> DB3
     Service4 --> DB4
     Service5 --> DB5
+
+    style Client fill:#00C853,color:#000000
+    style Gateway fill:#FFD600
+    style DataLayer fill:#BBDEFB
+    style ServiceLayer color:#000000
+    linkStyle 6 stroke:#D50000,fill:none
+    linkStyle 7 stroke:#D50000,fill:none
+    linkStyle 8 stroke:#D50000,fill:none
+    linkStyle 9 stroke:#D50000,fill:none
+    linkStyle 10 stroke:#2962FF,fill:none
+    linkStyle 11 stroke:#2962FF,fill:none
+    linkStyle 12 stroke:#AA00FF,fill:none
+    linkStyle 13 stroke:#AA00FF,fill:none
+    linkStyle 14 stroke:#AA00FF,fill:none
 
 ```
 ---
@@ -130,9 +121,9 @@ docker-compose run --rm service-4-schedule flask seed-schedules
 | Nama             | NIM   | Peran                                    |
 | ---------------- | ----- | ---------------------------------------- |
 | **AHMAD AKMAL AMRAN** | 102022300010 | Membuat User Service, Bus Service, dan API Gateway |
-| **FIRDAUS AL HAMID** | 102022300403 | Membuat Route Service dan Schedule Service |
-| **ILHAM FAHMI** | 102022300223 | Membuat Stop Service dan Frontend |
-| **JOSUA IMMANUEL NATANAEL PASARIBU** | 102022300271 | Bertanggung jawab terhadap Schedule Service (Tidak dikerjakan karena sibuk organisasi dan storage laptopnya penuh) |
+| **FIRDAUS AL HAMID** | 102022300403 | Membuat Route Service, Schedule Service, dan Arsitektur Sistem |
+| **ILHAM FAHMI** | 102022300223 | Membuat Stop Service dan keseluruhan Frontend |
+| **JOSUA IMMANUEL NATANAEL PASARIBU** | 102022300271 | Bertanggung jawab terhadap Schedule Service (**Tidak dikerjakan sama sekali karena sibuk organisasi dan storage laptopnya penuh**) |
 
 ---
 

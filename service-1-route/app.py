@@ -22,16 +22,11 @@ db_path = os.path.join(app.instance_path, 'route.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', f'sqlite:///{db_path}')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Admin credentials (dalam production, gunakan JWT atau OAuth)
-ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
-
 # URL Bus Service (untuk integrasi)
 BUS_SERVICE_URL = os.environ.get('BUS_SERVICE_URL', 'http://localhost:5004')
 
 # Inisialisasi Database
 db.init_app(app)
-
 
 # --- Middleware untuk Autentikasi Admin ---
 def admin_required(f):

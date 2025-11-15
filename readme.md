@@ -40,10 +40,10 @@ flowchart TB
 
     Client["Frontend Client"] --> Gateway["API Gateway"]
     Gateway --> Service1 & Service2 & Service3 & Service4 & Service5
-    Service1 -. HTTP Response .-> Service2 & Service3 & Service4 & Service5
+    Service1 <-. HTTP Response/Request .-> Service2 & Service3 & Service4 & Service5
     Service4 <-. HTTP Request/Response .-> Service2
-    Service4 -. HTTP Request/Response .-> Service3
-    Service5 -. HTTP Request .-> Service2 & Service3 & Service4
+    Service4 <-. HTTP Request/Response .-> Service3
+    Service5 <-. HTTP Request/Response .-> Service2 & Service3 & Service4
     Service1 --> DB1
     Service2 --> DB2
     Service3 --> DB3
@@ -230,6 +230,11 @@ Dokumentasi endpoint lengkap ada di folder:
 docs/API documentation/
 ```
 Isi:
+* `Bus Service Postman`
+* `Route Service Postman`
+* `Schedule Service Postman`
+* `Stop Service Postman`
+* `User Service Postman`
 * `Transport System API - Complete.postman_collection.json`
 
 Diagram sistem lengkap ada di folder:

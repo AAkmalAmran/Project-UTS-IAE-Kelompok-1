@@ -96,14 +96,17 @@ git clone https://github.com/AAkmalAmran/Project-UTS-IAE-Kelompok-1.git
 > c. Jalankan command dibawah
 
 ```bash
+# Menjalankan Aplikasi
 docker-compose up --build -d
 
+#Inisialisasi Database (init-db)
 docker-compose run --rm service-user flask init-db
 docker-compose run --rm service-1-route flask init-db
 docker-compose run --rm service-2-stop flask init-db
 docker-compose run --rm service-3-bus flask init-db
 docker-compose run --rm service-4-schedule flask init-db
 
+# Pengisian Data Awal (seed-db)
 docker-compose run --rm service-user flask seed-admin
 docker-compose run --rm service-1-route flask seed-routes
 docker-compose run --rm service-2-stop flask seed-stops
@@ -113,7 +116,12 @@ docker-compose run --rm service-4-schedule flask seed-schedules
 
 ### **5. Cek Apakah Proyek Sudah Berjalan di Docker Desktop**
 
-### **6. Buka Browser dan Buka http://localhost:5000**
+### **6. Buka Browser dan Buka http://localhost:5000 untuk mengakses frontend** 
+### **7. Username dan Password Admin**
+```bash
+username: admin
+password: admin123
+```
 
 ---
 
@@ -129,6 +137,17 @@ docker-compose run --rm service-4-schedule flask seed-schedules
 ---
 
 # 📚 **Ringkasan Endpoint**
+
+## **Port Tiap Service**
+
+| Service | Port                 | 
+| ------ | ------------------------ | 
+| API Gateway    | 5000 | 
+| User Service    | 5001 | 
+| Route Service    | 5002 |
+| Stop Service    | 5003   | 
+| Bus Service    | 5004    |
+| Schedule Service    | 5005    | 
 
 ## **User Service**
 
@@ -218,7 +237,6 @@ docker-compose run --rm service-4-schedule flask seed-schedules
 | GET, POST, PUT, DELETE    | `/api/stop/*`    | Stop Service    |
 | GET, POST, PUT, DELETE    | `/api/bus/*`    | Bus Service    |
 | GET, POST, PUT, DELETE    | `/api/schedule/*`    | Schedule Service    |
-
 
 ---
 

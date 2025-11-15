@@ -124,7 +124,7 @@ docker-compose run --rm service-4-schedule flask seed-schedules
 | **AHMAD AKMAL AMRAN** | 102022300010 | Membuat User Service, Bus Service, API Gateway, dan Dokumentasi API menggunakan Postman |
 | **FIRDAUS AL HAMID** | 102022300403 | Membuat Route Service, Schedule Service, dan Diagram Arsitektur Sistem |
 | **ILHAM FAHMI** | 102022300223 | Membuat Stop Service dan keseluruhan Frontend |
-| **JOSUA IMMANUEL NATANAEL PASARIBU** | 102022300271 | Bertanggung jawab terhadap Schedule Service (**Tidak mengerjakan apapun karena sibuk organisasi dan storage laptopnya penuh**) |
+| **JOSUA IMMANUEL NATANAEL PASARIBU** | 102022300271 | Diberikan tanggung jawab terhadap Schedule Service **Tetapi Tidak Dikerjakan** |
 
 ---
 

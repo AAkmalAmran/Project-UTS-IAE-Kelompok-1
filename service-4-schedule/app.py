@@ -190,7 +190,7 @@ def calculate_bus_eta():
         bus_id = int(request.args.get('busId'))
         stop_id = int(request.args.get('stopId'))
     except (TypeError, ValueError):
-        return jsonify({'error': 'Parameter busId dan stopId harus berupa angka.'}), 400
+        return jsonify({'error': 'Parameter busId dan stopId harus merupakan angka.'}), 400
     
     # Ambil lokasi bus real-time
     bus_data = get_bus_location(bus_id)

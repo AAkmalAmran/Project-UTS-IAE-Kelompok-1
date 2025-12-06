@@ -130,9 +130,9 @@ password: admin123
 | Nama             | NIM   | Peran                                    |
 | ---------------- | ----- | ---------------------------------------- |
 | **AHMAD AKMAL AMRAN** | 102022300010 | Membuat User Service, Bus Service, API Gateway, dan Dokumentasi API menggunakan Postman |
-| **FIRDAUS AL HAMID** | 102022300403 | Membuat Route Service, Schedule Service, dan Diagram Arsitektur Sistem |
+| **FIRDAUS AL HAMID** | 102022300403 | Membuat Route Service, dan Diagram Arsitektur Sistem |
 | **ILHAM FAHMI** | 102022300223 | Membuat Stop Service dan keseluruhan Frontend |
-| **JOSUA IMMANUEL NATANAEL PASARIBU** | 102022300271 | Diberikan tanggung jawab terhadap Schedule Service **Tetapi Tidak Dikerjakan** |
+| **JOSUA IMMANUEL NATANAEL PASARIBU** | 102022300271 | Diberikan tanggung jawab terhadap Schedule Service |
 
 ---
 

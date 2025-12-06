@@ -28,6 +28,11 @@ ROUTE_SERVICE_URL = os.environ.get('ROUTE_SERVICE_URL', 'http://localhost:5002')
 STOP_SERVICE_URL = os.environ.get('STOP_SERVICE_URL', 'http://localhost:5003')
 BUS_SERVICE_URL = os.environ.get('BUS_SERVICE_URL', 'http://localhost:5004')
 
+# Timeout untuk request eksternal (dalam detik)
+REQUEST_TIMEOUT = 5
+# Radius maksimal untuk pencarian bus di halte (dalam km)
+MAX_SEARCH_RADIUS_KM = 10.0
+
 # Inisialisasi Database
 db.init_app(app)
 
@@ -96,11 +101,12 @@ def get_bus_location(bus_id):
     Mengambil lokasi real-time bus dari Bus Service.
     """
     try:
-        response = requests.get(f'{BUS_SERVICE_URL}/buses/{bus_id}', timeout=5)
+        response = requests.get(f'{BUS_SERVICE_URL}/buses/{bus_id}', timeout=REQUEST_TIMEOUT)
         if response.status_code == 200:
             return response.json()
         return None
-    except requests.exceptions.RequestException:
+    except requests.exceptions.RequestException as e:
+        print(f'Warning: Gagal mengambil lokasi bus {bus_id}: {str(e)}')
         return None
 
 
@@ -109,11 +115,12 @@ def get_stop_location(stop_id):
     Mengambil lokasi halte dari Stop Service.
     """
     try:
-        response = requests.get(f'{STOP_SERVICE_URL}/stops/{stop_id}', timeout=5)
+        response = requests.get(f'{STOP_SERVICE_URL}/stops/{stop_id}', timeout=REQUEST_TIMEOUT)
         if response.status_code == 200:
             return response.json()
         return None
-    except requests.exceptions.RequestException:
+    except requests.exceptions.RequestException as e:
+        print(f'Warning: Gagal mengambil lokasi halte {stop_id}: {str(e)}')
         return None
 
 
@@ -122,11 +129,12 @@ def get_route_info(route_id):
     Mengambil informasi rute dari Route Service.
     """
     try:
-        response = requests.get(f'{ROUTE_SERVICE_URL}/routes/{route_id}', timeout=5)
+        response = requests.get(f'{ROUTE_SERVICE_URL}/routes/{route_id}', timeout=REQUEST_TIMEOUT)
         if response.status_code == 200:
             return response.json()
         return None
-    except requests.exceptions.RequestException:
+    except requests.exceptions.RequestException as e:
+        print(f'Warning: Gagal mengambil info rute {route_id}: {str(e)}')
         return None
 
 
@@ -305,8 +313,8 @@ def get_stop_arrivals(stopId):
         average_speed = bus.get('speed', {}).get('average', 40.0)
         eta = calculate_eta(distance, average_speed)
         
-        # Hanya tampilkan bus yang dalam radius 10 km
-        if distance <= 10.0:
+        # Hanya tampilkan bus yang dalam radius maksimal
+        if distance <= MAX_SEARCH_RADIUS_KM:
             arrivals.append({
                 'busId': bus['busId'],
                 'busNumber': bus['nomor_polisi'],

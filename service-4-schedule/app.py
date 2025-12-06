@@ -1,9 +1,11 @@
+# type: ignore
 import os
 from flask import Flask, jsonify, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from functools import wraps
 from datetime import datetime, timedelta
+from typing import Any, List, Optional, Dict
 from math import radians, cos, sin, asin, sqrt
 import requests
 
@@ -154,8 +156,102 @@ def index():
 
 @app.route('/schedules', methods=['GET'])
 def get_all_schedules():
-    schedules = Schedule.query.filter_by(is_active=True).all()
-    
+    """
+    GET /schedules[?routeId=x]: Jika `routeId` diberikan, kembalikan hanya jadwal
+    untuk rute tersebut. Jika tidak, kembalikan semua jadwal aktif.
+    """
+    # Normalize parameter names: accept routeId, route_id, routeid, and similarly for busId
+    def _get_int_param(variants):
+        # Try query params first
+        for name in variants:
+            val = request.args.get(name)
+            if val is not None:
+                try:
+                    return int(val)
+                except (TypeError, ValueError):
+                    return None
+
+        # Fallback: try JSON body (some clients send body with GET)
+        data = request.get_json(silent=True) or {}
+        for name in variants:
+            if name in data:
+                try:
+                    return int(data.get(name))
+                except (TypeError, ValueError):
+                    return None
+
+        return None
+
+    route_id_param = _get_int_param(['routeId', 'route_id', 'routeid'])
+    bus_id_param = _get_int_param(['busId', 'bus_id', 'busid'])
+
+    # Jika kedua parameter diberikan, pastikan kedua cocok (AND)
+    if route_id_param is not None and bus_id_param is not None:
+        route_id = route_id_param
+        bus_id = bus_id_param
+
+        schedules: List[Any] = Schedule.query.filter_by(route_id=route_id, bus_id=bus_id, is_active=True).all()
+        if not schedules:
+            return jsonify({
+                'routeId': route_id,
+                'busId': bus_id,
+                'total': 0,
+                'schedules': [],
+                'message': 'Tidak ada jadwal yang cocok untuk kombinasi routeId dan busId ini.'
+            }), 200
+
+        route_info = get_route_info(route_id)
+        return jsonify({
+            'routeId': route_id,
+            'busId': bus_id,
+            'routeName': route_info.get('name') if route_info else schedules[0].route_name,
+            'total': len(schedules),
+            'schedules': [schedule.to_dict() for schedule in schedules]
+        }), 200
+
+    # Jika hanya routeId diberikan
+    if route_id_param is not None:
+        route_id = route_id_param
+        schedules: List[Any] = Schedule.query.filter_by(route_id=route_id, is_active=True).all()
+
+        if not schedules:
+            return jsonify({
+                'routeId': route_id,
+                'total': 0,
+                'schedules': [],
+                'message': 'Tidak ada jadwal untuk rute ini.'
+            }), 200
+
+        route_info = get_route_info(route_id)
+        return jsonify({
+            'routeId': route_id,
+            'routeName': route_info.get('name') if route_info else schedules[0].route_name,
+            'total': len(schedules),
+            'schedules': [schedule.to_dict() for schedule in schedules]
+        }), 200
+
+    # Jika hanya busId diberikan
+    if bus_id_param is not None:
+        bus_id = bus_id_param
+        schedules: List[Any] = Schedule.query.filter_by(bus_id=bus_id, is_active=True).all()
+
+        if not schedules:
+            return jsonify({
+                'busId': bus_id,
+                'total': 0,
+                'schedules': [],
+                'message': 'Tidak ada jadwal untuk bus ini.'
+            }), 200
+
+        return jsonify({
+            'busId': bus_id,
+            'total': len(schedules),
+            'schedules': [schedule.to_dict() for schedule in schedules]
+        }), 200
+
+    # Default: kembalikan semua jadwal aktif
+    schedules: List[Any] = Schedule.query.filter_by(is_active=True).all()
+
     return jsonify({
         'total': len(schedules),
         'schedules': [schedule.to_dict() for schedule in schedules]
@@ -188,17 +284,47 @@ def get_route_schedules(routeId):
     }), 200
 
 
+@app.route('/schedule/<int:scheduleId>', methods=['GET'])
+def get_schedule_by_id(scheduleId):
+    """
+    GET /schedule/{scheduleId}: Mengembalikan satu jadwal berdasarkan ID jadwal.
+    """
+    schedule = db.session.get(Schedule, scheduleId)
+    if not schedule:
+        return jsonify({'error': 'Jadwal tidak ditemukan.'}), 404
+
+    return jsonify({'schedule': schedule.to_dict()}), 200
+
+
+@app.route('/buses/<int:busId>/schedules', methods=['GET'])
+def get_schedules_by_bus(busId):
+    """
+    GET /buses/{busId}/schedules: Mengembalikan daftar jadwal untuk bus tertentu.
+    """
+    # optional route filter to disambiguate schedules for same bus on multiple routes
+    route_filter = request.args.get('routeId', type=int) or request.args.get('route_id', type=int) or request.args.get('routeid', type=int)
+
+    if route_filter is not None:
+        schedules: List[Any] = Schedule.query.filter_by(bus_id=busId, route_id=route_filter, is_active=True).all()
+    else:
+        schedules: List[Any] = Schedule.query.filter_by(bus_id=busId, is_active=True).all()
+    if not schedules:
+        return jsonify({'busId': busId, 'total': 0, 'schedules': [], 'message': 'Tidak ada jadwal untuk bus ini.'}), 200
+
+    return jsonify({'busId': busId, 'total': len(schedules), 'schedules': [s.to_dict() for s in schedules]}), 200
+
+
 @app.route('/eta', methods=['GET'])
 def calculate_bus_eta():
     """
     GET /eta?busId=x&stopId=y: Memprediksi berapa menit lagi bus X akan tiba di Halte Y.
     Ini adalah fungsi kunci yang memanggil data lokasi real-time dari BusService.
     """
-    try:
-        bus_id = int(request.args.get('busId'))
-        stop_id = int(request.args.get('stopId'))
-    except (TypeError, ValueError):
-        return jsonify({'error': 'Parameter busId dan stopId harus merupakan angka.'}), 400
+    bus_id = request.args.get('busId', type=int)
+    stop_id = request.args.get('stopId', type=int)
+
+    if bus_id is None or stop_id is None:
+        return jsonify({'error': 'Parameter busId dan stopId harus diberikan dan berupa angka.'}), 400
     
     # Ambil lokasi bus real-time
     bus_data = get_bus_location(bus_id)
@@ -277,9 +403,13 @@ def get_stop_arrivals(stopId):
     stop_lat = stop_data['coordinates']['latitude']
     stop_lon = stop_data['coordinates']['longitude']
     
+    # Ambil optional filter dari query params (routeId / busId)
+    filter_route_id = request.args.get('routeId', type=int)
+    filter_bus_id = request.args.get('busId', type=int)
+
     # Ambil semua bus yang sedang beroperasi
     try:
-        buses_response = requests.get(f'{BUS_SERVICE_URL}/buses', timeout=5)
+        buses_response = requests.get(f'{BUS_SERVICE_URL}/buses', timeout=REQUEST_TIMEOUT)
         if buses_response.status_code != 200:
             return jsonify({'error': 'Tidak dapat mengambil data bus.'}), 500
         
@@ -300,6 +430,17 @@ def get_stop_arrivals(stopId):
         # Skip bus yang tidak punya route
         if not bus.get('route'):
             continue
+
+        # Jika filter routeId diberikan, skip bus yang tidak cocok
+        if filter_route_id is not None:
+            bus_route = bus.get('route', {})
+            if bus_route.get('routeId') != filter_route_id:
+                continue
+
+        # Jika filter busId diberikan, skip bus yang tidak cocok
+        if filter_bus_id is not None:
+            if bus.get('busId') != filter_bus_id:
+                continue
         
         bus_lat = bus['lokasi_geografis']['latitude']
         bus_lon = bus['lokasi_geografis']['longitude']
@@ -427,7 +568,17 @@ def admin_add_schedule():
         datetime.strptime(data['departure_time'], '%H:%M')
     except ValueError:
         return jsonify({'error': 'Format departure_time harus HH:MM (misal: 06:00)'}), 400
-    
+    # Validasi frequency_minutes jika diberikan
+    freq_value = data.get('frequency_minutes')
+    if freq_value is not None:
+        try:
+            freq_value = int(freq_value)
+        except (TypeError, ValueError):
+            return jsonify({'error': 'frequency_minutes harus berupa angka bulat.'}), 400
+
+        if freq_value < 0:
+            return jsonify({'error': 'frequency_minutes tidak boleh negatif.'}), 400
+
     # Buat jadwal baru
     new_schedule = Schedule(
         route_id=data['route_id'],
@@ -436,7 +587,7 @@ def admin_add_schedule():
         bus_number=data.get('bus_number', f'Bus {data["bus_id"]}'),
         departure_time=data['departure_time'],
         operating_days=data.get('operating_days', 'Daily'),
-        frequency_minutes=data.get('frequency_minutes'),
+        frequency_minutes=freq_value,
         is_active=data.get('is_active', True)
     )
     
@@ -475,7 +626,16 @@ def admin_update_schedule(scheduleId):
         schedule.operating_days = data['operating_days']
     
     if 'frequency_minutes' in data:
-        schedule.frequency_minutes = data['frequency_minutes']
+        # Validate frequency_minutes is integer >= 0
+        try:
+            freq = int(data['frequency_minutes'])
+        except (TypeError, ValueError):
+            return jsonify({'error': 'frequency_minutes harus berupa angka bulat.'}), 400
+
+        if freq < 0:
+            return jsonify({'error': 'frequency_minutes tidak boleh negatif.'}), 400
+
+        schedule.frequency_minutes = freq
     
     if 'is_active' in data:
         schedule.is_active = data['is_active']

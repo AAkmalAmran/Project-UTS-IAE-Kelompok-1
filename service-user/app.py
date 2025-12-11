@@ -136,7 +136,7 @@ def login():
     user = User.query.filter_by(username=username).first()
 
     if not user or not check_password_hash(user.password_hash, password):
-        return jsonify({"message": "Kredensial tidak valid"}), 401
+        return jsonify({"message": "Password tidak valid"}), 401
 
     token = generate_token(user.username, user.role)
     return jsonify({

@@ -229,12 +229,21 @@ def admin_add_stop():
     for field in required_fields:
         if field not in data:
             return jsonify({'error': f'Field {field} wajib diisi.'}), 400
+        
+    try:
+        lat = float(data['latitude'])
+        long = float(data['longitude'])
+    except ValueError:
+        return jsonify({'error': 'Latitude dan Longitude harus berupa angka.'}), 400
+    
+    if not (-90 <= lat <= 90) or not (-180 <= long <= 180):
+        return jsonify({'error': 'Latitude harus antara -90 dan 90, Longitude antara -180 dan 180.'}), 400
     
     # Buat halte baru
     new_stop = Stop(
         name=data['name'],
-        latitude=data['latitude'],
-        longitude=data['longitude'],
+        latitude=lat,
+        longitude=long,
         address=data.get('address'),
         shelter=data.get('shelter', False),
         seating=data.get('seating', False),

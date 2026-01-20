@@ -1,6 +1,6 @@
 # **Public Transportation Tracker Microservices**
 
-## 📌 Deskripsi Proyek
+## Deskripsi Proyek
 
 **Public Transportation Tracker Microservices** adalah sebuah sistem perangkat lunak yang dirancang untuk melacak dan mengelola layanan transportasi publik, khususnya bus. Proyek ini dibangun menggunakan arsitektur *microservices*, di mana fungsionalitas inti dipecah menjadi beberapa layanan (services) yang independen namun saling terhubung.
 
@@ -18,7 +18,7 @@ Proyek ini dirancang untuk dijalankan dan dikelola menggunakan **Docker Desktop*
 
 ---
 
-## 🏗️ **Arsitektur Sistem**
+## **Arsitektur Sistem**
 ```mermaid
 
 flowchart TB
@@ -65,12 +65,12 @@ flowchart TB
     linkStyle 14 stroke:#AA00FF,fill:none
 ```
 ---
-## 🚀 **Cara Menjalankan Proyek**
+## **Cara Menjalankan Proyek**
 
 ### **1. Clone Repository**
 
 ```bash
-git clone https://github.com/AAkmalAmran/Project-UTS-IAE-Kelompok-1.git
+git clone https://github.com/AAkmalAmran/microservices-bus-system.git
 ```
 
 ### **2. Konfigurasi File ENV**
@@ -125,7 +125,7 @@ password: admin123
 
 ---
 
-## 👥 **Anggota Kelompok & Peran**
+## **Anggota Kelompok & Peran**
 
 | Nama             | NIM   | Peran                                    |
 | ---------------- | ----- | ---------------------------------------- |
@@ -136,7 +136,7 @@ password: admin123
 
 ---
 
-# 📚 **Ringkasan Endpoint**
+# **Ringkasan Endpoint**
 
 ## **Port Tiap Service**
 
@@ -240,7 +240,7 @@ password: admin123
 
 ---
 
-# 📄 **Dokumentasi API Lengkap**
+# **Dokumentasi API Lengkap**
 
 Dokumentasi endpoint lengkap ada di folder:
 
